@@ -59,18 +59,18 @@ func init() {
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-// initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" { // enable ability to specify config file via flag
-		viper.SetConfigFile(cfgFile)
-	}
 
-	viper.SetConfigName(".huitaca") // name of config file (without extension)
-	viper.AddConfigPath("$HOME")    // adding home directory as first search path
-	viper.AutomaticEnv()            // read in environment variables that match
+	viper.SetConfigFile("./huitaca")
+	viper.SetConfigType("toml")
+	//viper.SetConfigName("huitaca")
+	//viper.AddConfigPath(".")
 
-	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	} else {
+		fmt.Println("Error parsing huitaca file: ", err)
 	}
+	fmt.Println(viper.AllKeys())
+
 }

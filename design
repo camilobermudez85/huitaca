@@ -1,0 +1,42 @@
+- Java microservices
+ 
+ - Improved UI (d3)
+ 
+ - Version Control
+     - Centralized tracking and management of JVM system properties
+     - Centralized tracking and management of DB changes
+ 
+ 
+ - Centralized and automatic logging management and configuration (fluentd, elasticsearch, kibana)
+     - Centralized container monitoring
+     - Centralized advanced JVM monitoring
+     - Optional heavy JVM monitoring
+     - HTTP traffic advanced monitor
+     
+ 
+ - Deployment Geographical Location Selection
+ - Deployment Availability Modes Selection
+ 
+ - Container deep configuration
+     - DB deployment configuration selection
+ 
+ 
+ - Promotion Workflow Management
+ 
+
+
+Docker containers
+Kubernetes
+Flannel
+Docker registry
+etcd
+fluentd
+elasticsearch
+Openshift
+
+Liquibase || Flyway || dbdeploy
+ 
+ 
+ Coming soon...
+ 
+ - Development Environment
