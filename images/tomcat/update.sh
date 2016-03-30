@@ -9,16 +9,16 @@ DOCKER_REPO="huitaca"
 IMAGE_NAME="tomcat"
 
 generate_dockerfiles() {
-    find . -type d -regex ".*/[1-9]-jre[1-9]" -prune -exec rm -rf {} \;
+    find . -type d -regex ".*/[1-9]-java[1-9]" -prune -exec rm -rf {} \;
     git clone ${TOMCAT_DOCKER_REPO}
     cd tomcat
 
     for version in $(find . -type d -regex "./[1-9]-jre[1-9]" -printf "%f\n" -prune); do
 
-	sed -i 's/FROM java:7-jre/FROM huitaca\/jre:openjdk-7/g' "${version}/Dockerfile"
-	sed -i 's/FROM java:8-jre/FROM huitaca\/jre:openjdk-8/g' "${version}/Dockerfile"
+	sed -i 's/FROM java:7-jre/FROM huitaca\/java:openjdk-7/g' "${version}/Dockerfile"
+	sed -i 's/FROM java:8-jre/FROM huitaca\/java:openjdk-8/g' "${version}/Dockerfile"
 
-	mv ${version} ..
+	mv ${version} ../${version/jre/java}
 
     done
 
@@ -28,7 +28,7 @@ generate_dockerfiles() {
 
 build_images() {
 
-    for tag in $(find . -type d -regex ".*/[1-9]-jre[1-9]" -printf '%P\n' -prune); do
+    for tag in $(find . -type d -regex ".*/[1-9]-java[1-9]" -printf '%P\n' -prune); do
 	docker build -t "${DOCKER_REPO}/${IMAGE_NAME}:${tag}" "${tag}"
     done
 }
