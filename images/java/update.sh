@@ -27,8 +27,8 @@ GRADLE_HOME="/usr/share/gradle"
 GRADLE_DOWNLOAD="https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-all.zip"
 
 declare -A java_tags=(
-	['openjdk-7']='openjdk-7-jdk'
-	['openjdk-8']='openjdk-8-jdk'
+	['openjdk-7']='java-1.7.0'
+	['openjdk-8']='java-1.8.0'
 )
 
 JDWP_ADDRESS="9009"
@@ -52,27 +52,29 @@ generate_dockerfiles() {
 		# Please DO NOT edit it directly.
 		#
 
-		FROM java:${java_tags[${version}]}
+		FROM openshift/base-centos7
 
 		MAINTAINER Camilo Bermúdez <camilobermudez85@gmail.com>
 
-		ENV JOLOKIA_VERSION "${JOLOKIA_VERSION}"
-		ENV JOLOKIA_DOWNLOAD "${JOLOKIA_DOWNLOAD}"
-		ENV JOLOKIA_HOST "${JOLOKIA_DEFAULT_HOST}"
-		ENV JOLOKIA_CONTEXT "${JOLOKIA_DEFAULT_CONTEXT}"
-		ENV JOLOKIA_DISCOVERY "${JOLOKIA_DEFAULT_DISCOVERY}"
-		ENV JOLOKIA_PORT "${JOLOKIA_PORT}"
+		ENV JAVA_VERSION "${java_tags[${version}]}"
 
-		ENV J4LOG_VERSION "${J4LOG_VERSION}"
-		ENV J4LOG_DOWNLOAD "${J4LOG_DOWNLOAD}"
+		ENV JOLOKIA_VERSION "${JOLOKIA_VERSION}" \\
+		    JOLOKIA_DOWNLOAD "${JOLOKIA_DOWNLOAD}" \\
+		    JOLOKIA_HOST "${JOLOKIA_DEFAULT_HOST}" \\
+		    JOLOKIA_CONTEXT "${JOLOKIA_DEFAULT_CONTEXT}" \\
+		    JOLOKIA_DISCOVERY "${JOLOKIA_DEFAULT_DISCOVERY}" \\
+		    JOLOKIA_PORT "${JOLOKIA_PORT}"
 
-		ENV MAVEN_VERSION "${MAVEN_VERSION}"
-		ENV MAVEN_HOME "${MAVEN_HOME}"
-		ENV MAVEN_DOWNLOAD "${MAVEN_DOWNLOAD}"
+		ENV J4LOG_VERSION "${J4LOG_VERSION}" \\
+		    J4LOG_DOWNLOAD "${J4LOG_DOWNLOAD}"
 
-		ENV GRADLE_VERSION "${GRADLE_VERSION}"
-		ENV GRADLE_HOME "${GRADLE_HOME}"
-		ENV GRADLE_DOWNLOAD "${GRADLE_DOWNLOAD}"
+		ENV MAVEN_VERSION "${MAVEN_VERSION}" \\
+		    MAVEN_HOME "${MAVEN_HOME}" \\
+		    MAVEN_DOWNLOAD "${MAVEN_DOWNLOAD}"
+
+		ENV GRADLE_VERSION "${GRADLE_VERSION}" \\
+		    GRADLE_HOME "${GRADLE_HOME}" \\
+		    GRADLE_DOWNLOAD "${GRADLE_DOWNLOAD}"
 
 		EXPOSE "${JOLOKIA_PORT}"
 EOF
@@ -80,9 +82,9 @@ EOF
 	cat >> "${version}/Dockerfile" <<-"EOF"
 
 		RUN set -x \
+	    && yum update -y && yum install -y "${JAVA_VERSION}-openjdk-devel" && yum clean all -y \
 	    && mkdir -p "${MAVEN_HOME}" \
-	    && curl -fsSL "${MAVEN_DOWNLOAD}" \
-	       | tar -xzC "${MAVEN_HOME}" --strip-components=1 \
+	    && curl -fsSL "${MAVEN_DOWNLOAD}" | tar -xzC "${MAVEN_HOME}" --strip-components=1 \
 	    && ln -s "${MAVEN_HOME}/bin/mvn" "/usr/bin/mvn" \
 	    && mkdir -p "${GRADLE_HOME}" && rm -rf "${GRADLE_HOME}" \
 	    && curl -sLO "${GRADLE_DOWNLOAD}" \
