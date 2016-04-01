@@ -29,12 +29,10 @@ var RootCmd = &cobra.Command{
 	Use:   "huitaca",
 	Short: "PaaS all the way through from the development environment to the cloud.",
 	Long: `
-
 Huitaca is a simple, easy to configure, 12-factor-app oriented PaaS that
-seamlessly streamlines the delivery pipeline starting at the development environment.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { fmt.Println("Huitaca invoked! Hellooo world!!!") },
+seamlessly streamlines the delivery pipeline starting at the development
+environment.`,
+	// Run: func(cmd *cobra.Command, args []string) { fmt.Println("Hello world") },
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -53,10 +51,10 @@ func init() {
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.huitaca.yaml)")
+	// RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.huitaca.yaml)")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func initConfig() {
@@ -71,6 +69,7 @@ func initConfig() {
 	} else {
 		fmt.Println("Error parsing huitaca file: ", err)
 	}
+
 	fmt.Println(viper.AllKeys())
 
 }

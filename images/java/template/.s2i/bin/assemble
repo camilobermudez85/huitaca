@@ -1,0 +1,74 @@
+#!/bin/bash -e
+#
+# S2I assemble script for the 'huitaca/java' image.
+# The 'assemble' script builds your application source so that it is ready to run.
+#
+# For more information refer to the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+if [[ "$1" == "-h" ]]; then
+	# If the 'huitaca/java' assemble script is executed with '-h' flag,
+	# print the usage.
+	exec /usr/libexec/s2i/usage
+fi
+
+# Restore maven dependencies downloaded in a previous build,
+# so they do not have to be downloaded again.
+# /tmp/artifacts will only be present in the incremental build scenario
+# in which the target image name is an existing docker image which contains
+# dependencies from a prior build execution.
+function restore_saved_dependencies() {
+	if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
+		echo "---> Restoring build artifacts..."
+		mv /tmp/artifacts/.m2 ${HOME}/.
+	else
+		echo -n "Can't find saved artifacts. Ignoring..."
+	fi
+}
+
+echo "---> Installing application source..."
+cp -rf /tmp/src/. ./
+
+
+echo "---> Building application from source..."
+
+# If a pom.xml is present, this is a maven build scenario
+if [ -f "./pom.xml" ]; then
+
+	if [ -z ${ARTIFACTS_DIR} ]; then
+	    export ARTIFACTS_DIR=$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate \
+		-Dexpression=project.build.directory | grep -Ev '(^\[|Download\w+:)')
+	elif [[ ${ARTIFACTS_DIR} != /* ]]; then
+	    export ARTIFACTS_DIR="$(pwd)/${ARTIFACTS_DIR}"
+	fi
+
+	restore_saved_dependencies
+
+	if [ -z "$MAVEN_ARGS" ]; then
+		export MAVEN_ARGS="package dependency:copy-dependencies -DskipTests -e"
+	fi
+	echo "Found pom.xml... attempting to build with 'mvn ${MAVEN_ARGS}'"
+
+	mvn --version
+	mvn $MAVEN_ARGS $MAVEN_DEBUG_ARGS | tee .mvn.out
+	cat .mvn.out | grep "properties used" > .mvn.props
+	sed -n 's/.*docker.env.MAIN=\([^, ]*\),.*/\1/p' .mvn.props | head -n 1 > $ARTIFACTS_DIR/JAVA_MAIN_CLASS
+
+	ERR=$?
+	if [ $ERR -ne 0 ]; then
+		echo "Aborting due to error code $ERR from mvn package"
+		exit $ERR
+	fi
+
+# If a build.gradle is present, this is a gradle build scenario
+elif [ -f "./build.gradle"]; then
+
+fi
+
+echo "Copying built artifacts from $ARTIFACTS_DIR into $BUILD_OUTPUT_DIR for later deployment..."
+if [ ! -e "${BUILD_OUTPUT_DIR}" ]; then
+    mkdir -p "${BUILD_OUTPUT_DIR}" &> /dev/null
+fi
+cp -rf "${ARTIFACTS_DIR}/*" "${BUILD_OUTPUT_DIR}" &> /dev/null
+echo "...done"
