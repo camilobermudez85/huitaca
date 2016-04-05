@@ -23,52 +23,55 @@ JDWP_DEFAULT_SUSPEND="n"
 
 build_images() {
     for version in "${huitaca_java_dev_versions[@]}"; do
-	docker build -t huitaca/java-dev:${version} ${version}
+        docker build -t huitaca/java-dev:${version} ${version}
     done
 }
 
 generate_dockerfiles() {
     for version in "${huitaca_java_dev_versions[@]}"; do
-	mkdir -p "${version}"
+        mkdir -p "${version}"
 	
 	cat > "${version}/Dockerfile" <<-EOF
-		#
-		# This Dockerfile is generated via "images/jre-dev/update.sh"
-		#
-		# Please DO NOT edit it directly.
-		#
+#
+# This Dockerfile is generated via "images/jre-dev/update.sh"
+#
+# Please DO NOT edit it directly.
+#
 
-		FROM huitaca/java:${version}
+FROM huitaca/java:${version}
 
-		MAINTAINER Camilo Bermúdez <camilobermudez85@gmail.com>
+MAINTAINER Camilo Bermúdez <camilobermudez85@gmail.com>
 
-		ENV DCEVM_DOWNLOAD "${dcevm_download[${version}]}"
-		ENV HOTSWAP_ZIP "${HOTSWAP_ZIP}"
-		ENV HOTSWAP_BASE "${HOTSWAP_BASE}"
+ENV DCEVM_DOWNLOAD="${dcevm_download[${version}]}" \\
+    HOTSWAP_ZIP="${HOTSWAP_ZIP}" \\
+    HOTSWAP_BASE="${HOTSWAP_BASE}" \\
+    JDWP_SERVER="${JDWP_DEFAULT_SERVER}" \\
+    JDWP_SUSPEND="${JDWP_DEFAULT_SUSPEND}" \\
+    JDWP_ADDRESS="${JDWP_ADDRESS}"
 
-		# JDWP variables
-		ENV JDWP_SERVER "${JDWP_DEFAULT_SERVER}"
-		ENV JDWP_SUSPEND "${JDWP_DEFAULT_SUSPEND}"
-		ENV JDWP_ADDRESS "${JDWP_ADDRESS}"
+LABEL io.k8s.description="Image for building Java development environments" \\
+      io.k8s.display-name="Java Development Builder" \\
+      io.openshift.tags="builder,java,development,${version}"
 
-		EXPOSE "${JDWP_ADDRESS}"
+EXPOSE "${JDWP_ADDRESS}"
 EOF
 
 	cat >> "${version}/Dockerfile" <<-"EOF"
 
-		RUN set -x \
-	    && curl -OL "${DCEVM_DOWNLOAD}" \
-	    && unzip DCEVM-*-installer.jar "linux_amd64_compiler2/product/libjvm.so" \
-	    && mv "linux_amd64_compiler2/product/libjvm.so" "${JAVA_HOME}/lib/amd64/server/" \
-	    && rm -rf linux_amd64_compiler2 DCEVM* \
-	    && curl -OL "${HOTSWAP_BASE}/${HOTSWAP_ZIP}" \
-	    && unzip "${HOTSWAP_ZIP}" \
-	    && mv hotswap-agent.jar "${JAVA_HOME}/bin" \
-	    && rm "${HOTSWAP_ZIP}" \
-	    && cd "${JAVA_HOME}/bin" \
-	        && EXTRA_OPTIONS="-javaagent:\${JAVA_HOME}/bin/hotswap-agent.jar -agentlib:jdwp=transport=dt_socket,server=\${JDWP_SERVER},suspend=\${JDWP_SUSPEND},address=${JDWP_ADDRESS}" \
-	        && echo "$(cat java) ${EXTRA_OPTIONS}" > java
+RUN set -x \
+    && curl -OL "${DCEVM_DOWNLOAD}" \
+    && whoami \
+    && unzip DCEVM-*-installer.jar "linux_amd64_compiler2/product/libjvm.so" \
+    && mv "linux_amd64_compiler2/product/libjvm.so" "${JAVA_HOME}/jre/lib/amd64/server/" \
+    && rm -rf linux_amd64_compiler2 DCEVM* \
+    && curl -OL "${HOTSWAP_BASE}/${HOTSWAP_ZIP}" \
+    && unzip "${HOTSWAP_ZIP}" \
+    && mv hotswap-agent.jar "${JAVA_HOME}/bin" \
+    && rm "${HOTSWAP_ZIP}"
+
+COPY ./.s2i/bin/* ${STI_SCRIPTS_PATH}/
 EOF
+        cp -r template/.s2i "./${version}" 
     done
 }
 

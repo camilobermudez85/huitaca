@@ -1,10 +1,15 @@
 #!/bin/bash -e
-#
-# S2I run script for the 'huitaca/java' image.
-# The run script executes the server that runs your application.
-#
-# For more information see the documentation:
-#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
-#
 
-exec <start your server here>
+for jar in "${BUILD_OUTPUT_DIR}"/*.jar ; do
+    JAR="${jar}"
+done
+
+if [ -z ${JAR} ]; then
+    echo "No jar could be found to be executed, exiting..."
+    exit 1
+fi
+
+JOLOKIA_AGENT_CONFIG="${JAVA_HOME}/bin/jolokia-jvm-${JOLOKIA_VERSION}-agent.jar=host=${JOLOKIA_HOST},port=${JOLOKIA_PORT},agentContext=${JOLOKIA_CONTEXT},discoveryEnabled=${JOLOKIA_DISCOVERY}"
+J4LOG_AGENT_CONFIG="${JAVA_HOME}/bin/j4log-agent-${J4LOG_VERSION}.jar"
+
+java -javaagent:${JOLOKIA_AGENT_CONFIG} -javaagent:${J4LOG_AGENT_CONFIG} -jar ${JAR}

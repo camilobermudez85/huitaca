@@ -8,11 +8,13 @@
 
 set -eo pipefail
 
+BUILDER_VERSION="1.0.0"
+
 JOLOKIA_VERSION="1.3.2"
 JOLOKIA_DOWNLOAD="http://search.maven.org/remotecontent?filepath=org/jolokia/jolokia-jvm/${JOLOKIA_VERSION}/jolokia-jvm-${JOLOKIA_VERSION}-agent.jar"
 JOLOKIA_PORT="7777"
 JOLOKIA_DEFAULT_HOST="0.0.0.0"
-JOLOKIA_DEFAULT_CONTEXT="jmx"
+JOLOKIA_DEFAULT_CONTEXT="/"
 JOLOKIA_DEFAULT_DISCOVERY="false"
 
 J4LOG_VERSION="v0.1.0-alpha"
@@ -37,7 +39,7 @@ JDWP_DEFAULT_SUSPEND="n"
 
 build_images() {
     for version in "${!java_tags[@]}"; do
-    docker build -t huitaca/java:${version} ${version}
+        docker build -t huitaca/java:${version} ${version}
     done
 }
 
@@ -56,24 +58,26 @@ FROM openshift/base-centos7
 
 MAINTAINER Camilo Bermúdez <camilobermudez85@gmail.com>
 
-ENV JAVA_VERSION "${java_tags[${version}]}" \\
-    JOLOKIA_VERSION "${JOLOKIA_VERSION}" \\
-    JOLOKIA_DOWNLOAD "${JOLOKIA_DOWNLOAD}" \\
-    JOLOKIA_HOST "${JOLOKIA_DEFAULT_HOST}" \\
-    JOLOKIA_CONTEXT "${JOLOKIA_DEFAULT_CONTEXT}" \\
-    JOLOKIA_DISCOVERY "${JOLOKIA_DEFAULT_DISCOVERY}" \\
-    JOLOKIA_PORT "${JOLOKIA_PORT}" \\
-    J4LOG_VERSION "${J4LOG_VERSION}" \\
-    J4LOG_DOWNLOAD "${J4LOG_DOWNLOAD}"
-    MAVEN_VERSION "${MAVEN_VERSION}" \\
-    MAVEN_HOME "${MAVEN_HOME}" \\
-    MAVEN_DOWNLOAD "${MAVEN_DOWNLOAD}" \\
-    GRADLE_VERSION "${GRADLE_VERSION}" \\
-    GRADLE_HOME "${GRADLE_HOME}" \\
-    GRADLE_DOWNLOAD "${GRADLE_DOWNLOAD}" \\
-    BUILDER_VERSION "1.0"
+ENV JAVA_VERSION="${java_tags[${version}]}" \\
+    JAVA_HOME="/usr/lib/jvm/${java_tags[${version}]}-openjdk" \\
+    JOLOKIA_VERSION="${JOLOKIA_VERSION}" \\
+    JOLOKIA_DOWNLOAD="${JOLOKIA_DOWNLOAD}" \\
+    JOLOKIA_HOST="${JOLOKIA_DEFAULT_HOST}" \\
+    JOLOKIA_CONTEXT="${JOLOKIA_DEFAULT_CONTEXT}" \\
+    JOLOKIA_DISCOVERY="${JOLOKIA_DEFAULT_DISCOVERY}" \\
+    JOLOKIA_PORT="${JOLOKIA_PORT}" \\
+    J4LOG_VERSION="${J4LOG_VERSION}" \\
+    J4LOG_DOWNLOAD="${J4LOG_DOWNLOAD}" \\
+    MAVEN_VERSION="${MAVEN_VERSION}" \\
+    MAVEN_HOME="${MAVEN_HOME}" \\
+    MAVEN_DOWNLOAD="${MAVEN_DOWNLOAD}" \\
+    GRADLE_VERSION="${GRADLE_VERSION}" \\
+    GRADLE_HOME="${GRADLE_HOME}" \\
+    GRADLE_DOWNLOAD="${GRADLE_DOWNLOAD}" \\
+    BUILDER_VERSION="${BUILDER_VERSION}" \\
+    BUILD_OUTPUT_DIR="/opt/app-root/build-output-dir"
 
-LABEL io.k8s.description="Platform for building Java applications" \\
+LABEL io.k8s.description="Image for building Java applications" \\
       io.k8s.display-name="Java Builder" \\
       io.openshift.tags="builder,java,${java_tags[${version}]}"
 
@@ -82,31 +86,27 @@ EOF
 
         cat >> "${version}/Dockerfile" <<-"EOF"
 
-RUN set -x \\
-    && yum update -y && yum install -y "${JAVA_VERSION}-openjdk-devel" && yum clean all -y \\
-    && mkdir -p "${MAVEN_HOME}" \\
-    && curl -fsSL "${MAVEN_DOWNLOAD}" | tar -xzC "${MAVEN_HOME}" --strip-components=1 \\
-    && ln -s "${MAVEN_HOME}/bin/mvn" "/usr/bin/mvn" \\
-    && mkdir -p "${GRADLE_HOME}" && rm -rf "${GRADLE_HOME}" \\
-    && curl -sLO "${GRADLE_DOWNLOAD}" \\
-    && unzip "gradle-${GRADLE_VERSION}-all.zip" \\
-    && mv "gradle-${GRADLE_VERSION}" "$GRADLE_HOME" \\
-    && rm "gradle-${GRADLE_VERSION}-all.zip" \\
-    && ln -s "${GRADLE_HOME}/bin/gradle" "/usr/bin/gradle" \\
-    && curl -OL "${JOLOKIA_DOWNLOAD}" \\
-    && mv "jolokia-jvm-${JOLOKIA_VERSION}-agent.jar" "${JAVA_HOME}/bin" \\
-    && rm -f "jolokia-jvm-${JOLOKIA_VERSION}-agent.jar" \\
-    && curl -OL "${J4LOG_DOWNLOAD}" \\
-    && mv "j4log-agent-${J4LOG_VERSION}.jar" "${JAVA_HOME}/bin" \\
-    && rm -f "j4log-agent-${J4LOG_VERSION}.jar" \\
-    && cd "${JAVA_HOME}/bin" \\
-        && mv java java-exec \\
-        && echo "\${JAVA_HOME}/bin/java-exec \"\$@\" -javaagent:\${JAVA_HOME}/bin/jolokia-jvm-${JOLOKIA_VERSION}-agent.jar=host=\${JOLOKIA_HOST},port=\${JOLOKIA_PORT},agentContext=\${JOLOKIA_CONTEXT},discoveryEnabled=\${JOLOKIA_DISCOVERY} -javaagent:\${JAVA_HOME}/bin/j4log-agent-${J4LOG_VERSION}.jar" > java \\
-        && chmod 755 java
+RUN set -x \
+    && yum -y update && yum -y install "${JAVA_VERSION}-openjdk-devel" && yum -y clean all \
+    && mkdir -p "${MAVEN_HOME}" \
+    && curl -fsSL "${MAVEN_DOWNLOAD}" | tar -xzC "${MAVEN_HOME}" --strip-components=1 \
+    && ln -s "${MAVEN_HOME}/bin/mvn" "/usr/bin/mvn" \
+    && mkdir -p "${GRADLE_HOME}" && rm -rf "${GRADLE_HOME}" \
+    && curl -sLO "${GRADLE_DOWNLOAD}" \
+    && unzip "gradle-${GRADLE_VERSION}-all.zip" \
+    && mv "gradle-${GRADLE_VERSION}" "$GRADLE_HOME" \
+    && rm "gradle-${GRADLE_VERSION}-all.zip" \
+    && ln -s "${GRADLE_HOME}/bin/gradle" "/usr/bin/gradle" \
+    && curl -OL "${JOLOKIA_DOWNLOAD}" \
+    && mv "jolokia-jvm-${JOLOKIA_VERSION}-agent.jar" "${JAVA_HOME}/bin" \
+    && rm -f "jolokia-jvm-${JOLOKIA_VERSION}-agent.jar" \
+    && curl -OL "${J4LOG_DOWNLOAD}" \
+    && mv "j4log-agent-${J4LOG_VERSION}.jar" "${JAVA_HOME}/bin" \
+    && rm -f "j4log-agent-${J4LOG_VERSION}.jar" \
+    && chown -R 1001:1001 ${JAVA_HOME}/jre/lib/amd64/server \
+    && chown -R 1001:1001 /opt/app-root
 
 COPY ./.s2i/bin/ ${STI_SCRIPTS_PATH}
-
-RUN chown -R 1001:1001 /opt/app-root
 
 USER 1001
 
