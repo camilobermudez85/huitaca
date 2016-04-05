@@ -8,28 +8,10 @@ FROM huitaca/java:openjdk-7
 
 MAINTAINER Camilo Bermúdez <camilobermudez85@gmail.com>
 
-ENV DCEVM_DOWNLOAD="https://github.com/dcevm/dcevm/releases/download/full-jdk7u79%2B7/DCEVM-full-7u79-installer.jar" \
-    HOTSWAP_ZIP="HotswapAgent-0.3.zip" \
-    HOTSWAP_BASE="https://github.com/HotswapProjects/HotswapAgent/releases/download/RELEASE-0.3" \
-    JDWP_SERVER="y" \
-    JDWP_SUSPEND="n" \
-    JDWP_ADDRESS="9009"
-
-LABEL io.k8s.description="Image for building Java development environments" \
+LABEL io.k8s.description="Image to support java development environments" \
       io.k8s.display-name="Java Development Builder" \
       io.openshift.tags="builder,java,development,openjdk-7"
 
-EXPOSE "9009"
-
-RUN set -x \
-    && curl -OL "${DCEVM_DOWNLOAD}" \
-    && whoami \
-    && unzip DCEVM-*-installer.jar "linux_amd64_compiler2/product/libjvm.so" \
-    && mv "linux_amd64_compiler2/product/libjvm.so" "${JAVA_HOME}/jre/lib/amd64/server/" \
-    && rm -rf linux_amd64_compiler2 DCEVM* \
-    && curl -OL "${HOTSWAP_BASE}/${HOTSWAP_ZIP}" \
-    && unzip "${HOTSWAP_ZIP}" \
-    && mv hotswap-agent.jar "${JAVA_HOME}/bin" \
-    && rm "${HOTSWAP_ZIP}"
+EXPOSE ${JDWP_ADDRESS}
 
 COPY ./.s2i/bin/* ${STI_SCRIPTS_PATH}/

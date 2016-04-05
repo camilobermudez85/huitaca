@@ -28,14 +28,22 @@ GRADLE_VERSION="2.6"
 GRADLE_HOME="/usr/share/gradle"
 GRADLE_DOWNLOAD="https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-all.zip"
 
+HOTSWAP_ZIP="HotswapAgent-0.3.zip"
+HOTSWAP_BASE="https://github.com/HotswapProjects/HotswapAgent/releases/download/RELEASE-0.3"
+
+JDWP_ADDRESS="9009"
+JDWP_DEFAULT_SERVER="y"
+JDWP_DEFAULT_SUSPEND="n"
+
 declare -A java_tags=(
     ['openjdk-7']='java-1.7.0'
     ['openjdk-8']='java-1.8.0'
 )
 
-JDWP_ADDRESS="9009"
-JDWP_DEFAULT_SERVER="y"
-JDWP_DEFAULT_SUSPEND="n"
+declare -A dcevm_download=(
+	['openjdk-7']='https://github.com/dcevm/dcevm/releases/download/full-jdk7u79%2B7/DCEVM-full-7u79-installer.jar'
+	['openjdk-8']='https://github.com/dcevm/dcevm/releases/download/light-jdk8u66%2B5/DCEVM-light-8u66-installer.jar'
+)
 
 build_images() {
     for version in "${!java_tags[@]}"; do
@@ -75,6 +83,12 @@ ENV JAVA_VERSION="${java_tags[${version}]}" \\
     GRADLE_HOME="${GRADLE_HOME}" \\
     GRADLE_DOWNLOAD="${GRADLE_DOWNLOAD}" \\
     BUILDER_VERSION="${BUILDER_VERSION}" \\
+    DCEVM_DOWNLOAD="${dcevm_download[${version}]}" \\
+    HOTSWAP_ZIP="${HOTSWAP_ZIP}" \\
+    HOTSWAP_BASE="${HOTSWAP_BASE}" \\
+    JDWP_SERVER="${JDWP_DEFAULT_SERVER}" \\
+    JDWP_SUSPEND="${JDWP_DEFAULT_SUSPEND}" \\
+    JDWP_ADDRESS="${JDWP_ADDRESS}" \\
     BUILD_OUTPUT_DIR="/opt/app-root/build-output-dir"
 
 LABEL io.k8s.description="Image for building Java applications" \\
@@ -103,7 +117,14 @@ RUN set -x \
     && curl -OL "${J4LOG_DOWNLOAD}" \
     && mv "j4log-agent-${J4LOG_VERSION}.jar" "${JAVA_HOME}/bin" \
     && rm -f "j4log-agent-${J4LOG_VERSION}.jar" \
-    && chown -R 1001:1001 ${JAVA_HOME}/jre/lib/amd64/server \
+    && curl -OL "${DCEVM_DOWNLOAD}" \
+    && unzip DCEVM-*-installer.jar "linux_amd64_compiler2/product/libjvm.so" \
+    && mv "linux_amd64_compiler2/product/libjvm.so" "${JAVA_HOME}/jre/lib/amd64/server/" \
+    && rm -rf linux_amd64_compiler2 DCEVM* \
+    && curl -OL "${HOTSWAP_BASE}/${HOTSWAP_ZIP}" \
+    && unzip "${HOTSWAP_ZIP}" \
+    && mv hotswap-agent.jar "${JAVA_HOME}/bin" \
+    && rm "${HOTSWAP_ZIP}"  \
     && chown -R 1001:1001 /opt/app-root
 
 COPY ./.s2i/bin/ ${STI_SCRIPTS_PATH}

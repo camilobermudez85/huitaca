@@ -25,6 +25,12 @@ ENV JAVA_VERSION="java-1.7.0" \
     GRADLE_HOME="/usr/share/gradle" \
     GRADLE_DOWNLOAD="https://services.gradle.org/distributions/gradle-2.6-all.zip" \
     BUILDER_VERSION="1.0.0" \
+    DCEVM_DOWNLOAD="https://github.com/dcevm/dcevm/releases/download/full-jdk7u79%2B7/DCEVM-full-7u79-installer.jar" \
+    HOTSWAP_ZIP="HotswapAgent-0.3.zip" \
+    HOTSWAP_BASE="https://github.com/HotswapProjects/HotswapAgent/releases/download/RELEASE-0.3" \
+    JDWP_SERVER="y" \
+    JDWP_SUSPEND="n" \
+    JDWP_ADDRESS="9009" \
     BUILD_OUTPUT_DIR="/opt/app-root/build-output-dir"
 
 LABEL io.k8s.description="Image for building Java applications" \
@@ -50,7 +56,14 @@ RUN set -x \
     && curl -OL "${J4LOG_DOWNLOAD}" \
     && mv "j4log-agent-${J4LOG_VERSION}.jar" "${JAVA_HOME}/bin" \
     && rm -f "j4log-agent-${J4LOG_VERSION}.jar" \
-    && chown -R 1001:1001 ${JAVA_HOME}/jre/lib/amd64/server \
+    && curl -OL "${DCEVM_DOWNLOAD}" \
+    && unzip DCEVM-*-installer.jar "linux_amd64_compiler2/product/libjvm.so" \
+    && mv "linux_amd64_compiler2/product/libjvm.so" "${JAVA_HOME}/jre/lib/amd64/server/" \
+    && rm -rf linux_amd64_compiler2 DCEVM* \
+    && curl -OL "${HOTSWAP_BASE}/${HOTSWAP_ZIP}" \
+    && unzip "${HOTSWAP_ZIP}" \
+    && mv hotswap-agent.jar "${JAVA_HOME}/bin" \
+    && rm "${HOTSWAP_ZIP}"  \
     && chown -R 1001:1001 /opt/app-root
 
 COPY ./.s2i/bin/ ${STI_SCRIPTS_PATH}
