@@ -37,4 +37,5 @@ RUN set -x \
 	&& rm bin/*.bat \
 	&& rm tomcat.tar.gz*
 
-EXPOSE 8080
+EXPOSE 80
+COPY ./.s2i/bin/ ${STI_SCRIPTS_PATH}

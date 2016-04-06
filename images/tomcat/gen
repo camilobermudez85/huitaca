@@ -17,6 +17,7 @@ generate_dockerfiles() {
             sed -i 's/FROM java:7-jre/FROM huitaca\/java:openjdk-7/g' "${jre}/Dockerfile"
             sed -i 's/FROM java:8-jre/FROM huitaca\/java:openjdk-8/g' "${jre}/Dockerfile"
             sed -i '/^CMD/d' "${jre}/Dockerfile"
+            sed -i 's/^EXPOSE 8080/EXPOSE 80\nCOPY .\/.s2i\/bin\/ ${STI_SCRIPTS_PATH}/g' "${jre}/Dockerfile"
             sed -i 's/\/usr\/local\/tomcat/\${HOME}\/tomcat/g' "${jre}/Dockerfile"
 
             local_version="../../${version}-${jre/jre/java}"
