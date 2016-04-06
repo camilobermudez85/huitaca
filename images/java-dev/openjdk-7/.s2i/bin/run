@@ -12,7 +12,7 @@ fi
 JOLOKIA_AGENT_CONFIG="${JAVA_HOME}/bin/jolokia-jvm-${JOLOKIA_VERSION}-agent.jar=host=${JOLOKIA_HOST},port=${JOLOKIA_PORT},agentContext=${JOLOKIA_CONTEXT},discoveryEnabled=${JOLOKIA_DISCOVERY}"
 J4LOG_AGENT_CONFIG="${JAVA_HOME}/bin/j4log-agent-${J4LOG_VERSION}.jar"
 
-# Java development additional configurations
+# Java development configurations
 HOTSWAP_AGENT_CONFIG="${JAVA_HOME}/bin/hotswap-agent.jar" 
 DEBUG_CONFIG="jdwp=transport=dt_socket,server=${JDWP_SERVER},suspend=${JDWP_SUSPEND},address=${JDWP_ADDRESS}"
 

@@ -27,7 +27,7 @@ generate_dockerfiles() {
         popd > /dev/null
     done
 
-    popd
+    popd > /dev/null
     rm -rf tomcat
 }
 

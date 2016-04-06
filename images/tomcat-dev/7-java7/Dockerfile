@@ -1,4 +1,4 @@
-FROM huitaca/java:openjdk-7
+FROM huitaca/java-dev:openjdk-7
 
 ENV CATALINA_HOME ${HOME}/tomcat
 ENV PATH $CATALINA_HOME/bin:$PATH
