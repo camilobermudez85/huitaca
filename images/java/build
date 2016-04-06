@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -eo pipefail
+
+DOCKER_REPO="huitaca"
+IMAGE_NAME="java"
+
+java_tags=('openjdk-7' 'openjdk-8')
+
+build_images() {
+    tag=$1
+    if [ ! -z ${tag} ] && [ -d ${tag} ]; then
+        docker build -t "${DOCKER_REPO}/${IMAGE_NAME}:${tag}" "${tag}"
+    else
+        for tag in "${java_tags[@]}"; do
+            docker build -t "${DOCKER_REPO}/${IMAGE_NAME}:${tag}" "${tag}"
+        done
+    fi
+}
+
+build_images "$@"

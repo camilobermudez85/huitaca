@@ -1,0 +1,15 @@
+#!/bin/bash -e
+
+for jar in "${BUILD_OUTPUT_DIR}"/*.jar ; do
+    JAR="${jar}"
+done
+
+if [ -z ${JAR} ]; then
+    echo "No jar could be found to be executed, exiting..."
+    exit 1
+fi
+
+JOLOKIA_AGENT_CONFIG="${JAVA_HOME}/bin/jolokia-jvm-${JOLOKIA_VERSION}-agent.jar=host=${JOLOKIA_HOST},port=${JOLOKIA_PORT},agentContext=${JOLOKIA_CONTEXT},discoveryEnabled=${JOLOKIA_DISCOVERY}"
+J4LOG_AGENT_CONFIG="${JAVA_HOME}/bin/j4log-agent-${J4LOG_VERSION}.jar"
+
+java -javaagent:${JOLOKIA_AGENT_CONFIG} -javaagent:${J4LOG_AGENT_CONFIG} -jar ${JAR}

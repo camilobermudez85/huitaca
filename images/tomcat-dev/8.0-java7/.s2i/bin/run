@@ -1,0 +1,21 @@
+#!/bin/bash -e
+
+for war in "${BUILD_OUTPUT_DIR}"/*.war ; do
+    WAR="${war}"
+done
+
+if [ -z ${WAR} ]; then
+    echo "No war could be found to be deployed, exiting..."
+    exit 1
+fi
+
+rm -rf webapps/* LICENSE NOTICE RELEASE-NOTES RUNNING.txt #&> /dev/null
+cp ${WAR} webapps/${CONTEXT_ROOT:-ROOT.war} #&> /dev/null
+
+JOLOKIA_AGENT_CONFIG="${JAVA_HOME}/bin/jolokia-jvm-${JOLOKIA_VERSION}-agent.jar=host=${JOLOKIA_HOST},port=${JOLOKIA_PORT},agentContext=${JOLOKIA_CONTEXT},discoveryEnabled=${JOLOKIA_DISCOVERY}"
+J4LOG_AGENT_CONFIG="${JAVA_HOME}/bin/j4log-agent-${J4LOG_VERSION}.jar"
+HOTSWAP_AGENT_CONFIG="${JAVA_HOME}/bin/hotswap-agent.jar"
+JDWP_CONFIG="jdwp=transport=dt_socket,server=${JDWP_SERVER},suspend=${JDWP_SUSPEND},address=${JDWP_ADDRESS}"
+
+export CATALINA_OPTS="${CATALINA_OPTS} -javaagent:${JOLOKIA_AGENT_CONFIG} -javaagent:${J4LOG_AGENT_CONFIG} -javaagent:${HOTSWAP_AGENT_CONFIG} -agentlib:${JDWP_CONFIG}"
+./bin/catalina.sh run

@@ -1,6 +1,6 @@
-FROM huitaca/java-dev:openjdk-7
+FROM huitaca/java:openjdk-7
 
-ENV CATALINA_HOME /usr/local/tomcat
+ENV CATALINA_HOME ${HOME}/tomcat
 ENV PATH $CATALINA_HOME/bin:$PATH
 RUN mkdir -p "$CATALINA_HOME"
 WORKDIR $CATALINA_HOME
@@ -38,4 +38,3 @@ RUN set -x \
 	&& rm tomcat.tar.gz*
 
 EXPOSE 8080
-CMD ["catalina.sh", "run"]

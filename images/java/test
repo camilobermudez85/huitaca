@@ -1,0 +1,23 @@
+#!/bin/bash
+
+DOCKER_REPO="huitaca"
+IMAGE="java"
+
+huitaca_java_dev_tags=('openjdk-7' 'openjdk-8')
+
+test_image() {
+    tag=$1
+    if [ ! -z ${tag} ] && [ -d ${tag} ]; then
+        full_name="${DOCKER_REPO}/${IMAGE}-candidate:${tag}"
+        docker build -t "${full_name}" "${tag}"
+        IMAGE_NAME=${full_name} ./.test/run
+    else
+        for tag in "${huitaca_java_dev_tags[@]}"; do
+            full_name="${DOCKER_REPO}/${IMAGE}-candidate:${tag}"
+            docker build -t "${full_name}" "${tag}"
+            IMAGE_NAME=${full_name} ./.test/run
+        done
+    fi
+}
+
+test_image "$@"

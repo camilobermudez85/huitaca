@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -eo pipefail
+
+huitaca_java_dev_tags=('openjdk-7' 'openjdk-8')
+
+generate_dockerfiles() {
+    for tag in "${huitaca_java_dev_tags[@]}"; do
+        mkdir -p "${tag}"
+	
+        cat > "${tag}/Dockerfile" <<-EOF
+#
+# This Dockerfile is generated via "images/jre-dev/update.sh"
+#
+# Please DO NOT edit it directly.
+#
+
+FROM huitaca/java:${tag}
+
+MAINTAINER Camilo Bermúdez <camilobermudez85@gmail.com>
+
+LABEL io.k8s.description="Image to support java development environments" \\
+      io.k8s.display-name="Java Development Builder" \\
+      io.openshift.tags="builder,java,development,${tag}"
+EOF
+
+        cat >> "${tag}/Dockerfile" <<-"EOF"
+
+EXPOSE ${JDWP_ADDRESS}
+
+COPY ./.s2i/bin/* ${STI_SCRIPTS_PATH}/
+EOF
+        shopt -s dotglob
+        cp -r .template/* "./${tag}" 
+    done
+}
+
+generate_dockerfiles "$@"

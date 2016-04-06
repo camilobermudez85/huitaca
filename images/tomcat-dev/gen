@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# Pulls the tomcat official images and tweaks them to make them use
+# huitaca's java development images.
+#
+
+TOMCAT_DOCKER_REPO="https://github.com/docker-library/tomcat.git"
+
+generate_dockerfiles() {
+    find . -type d -regex "./[0-9]+.?[0-9]?-java[1-9]" -prune -exec rm -rf {} \;
+    git clone ${TOMCAT_DOCKER_REPO}
+    pushd tomcat > /dev/null
+
+    for version in $(find . -type d -regex "./[1-9]+.?[0-9]?" -printf "%f\n" -prune); do
+        pushd ${version} > /dev/null
+        for jre in *; do
+            sed -i 's/FROM java:7-jre/FROM huitaca\/java-dev:openjdk-7/g' "${jre}/Dockerfile"
+            sed -i 's/FROM java:8-jre/FROM huitaca\/java-dev:openjdk-8/g' "${jre}/Dockerfile"
+            sed -i '/^CMD/d' "${jre}/Dockerfile"
+            sed -i 's/\/usr\/local\/tomcat/\${HOME}\/tomcat/g' "${jre}/Dockerfile"
+
+            local_version="../../${version}-${jre/jre/java}"
+            mv ${jre} ${local_version}
+            shopt -s dotglob
+            cp -r ../../.template/* ${local_version}
+        done
+        popd > /dev/null
+    done
+
+    popd
+    rm -rf tomcat
+}
+
+generate_dockerfiles "$@"
