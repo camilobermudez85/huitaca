@@ -15,11 +15,10 @@
 package cmd
 
 import (
+	"bitbucket.org/camilobermudez/huitaca/utils"
 	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"os"
 )
 
 var cfgFile string
@@ -59,17 +58,7 @@ func init() {
 
 func initConfig() {
 
-	viper.SetConfigFile("./huitaca")
-	viper.SetConfigType("toml")
-	//viper.SetConfigName("huitaca")
-	//viper.AddConfigPath(".")
-
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	} else {
-		fmt.Println("Error parsing huitaca file: ", err)
-	}
-
-	fmt.Println(viper.AllKeys())
+	utils.InitConfig()
+	fmt.Println(utils.GetConfig().AllKeys())
 
 }
