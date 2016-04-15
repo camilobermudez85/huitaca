@@ -2,10 +2,10 @@ package utils
 
 import (
 	"fmt"
-	"github.com/kardianos/osext"
+	//	"github.com/kardianos/osext"
 	//	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	//	"os"
+	"os"
 )
 
 var projectConfig = viper.New()
@@ -13,7 +13,7 @@ var effectiveConfig = viper.New()
 var wd string
 
 func InitConfig() {
-	wd, err := osext.ExecutableFolder()
+	wd, err := os.Getwd()
 	if err != nil {
 		fmt.Println("Error resolving current directory.", err)
 		panic(err)
@@ -24,13 +24,14 @@ func InitConfig() {
 	projectConfig.SetConfigType("toml")
 
 	if err := projectConfig.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		fmt.Println("Using config file:", projectConfig.ConfigFileUsed())
 	} else {
 		fmt.Println("Error parsing huitaca file: ", err)
+		panic(err)
 	}
 
 }
 
-func GetConfig() *viper.Viper {
+func GetEffectiveConfig() *viper.Viper {
 	return projectConfig
 }
