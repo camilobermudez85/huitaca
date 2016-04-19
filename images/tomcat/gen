@@ -1,35 +1,88 @@
 #!/bin/bash
-#
-# Pulls the tomcat official images and tweaks them to make them use
-# huitaca's java development images.
-#
 
-TOMCAT_DOCKER_REPO="https://github.com/docker-library/tomcat.git"
+declare -A from=(
+['6-java7']='huitaca/java:openjdk-7'
+['6-java8']='huitaca/java:openjdk-8'
+['7-java7']='huitaca/java:openjdk-7'
+['7-java8']='huitaca/java:openjdk-8' 
+['8.0-java7']='huitaca/java:openjdk-7'
+['8.0-java8']='huitaca/java:openjdk-8'
+['8.5-java8']='huitaca/java:openjdk-8'
+['9.0-java8']='huitaca/java:openjdk-8'
+)
+
+declare -A tomcat_major=(
+['6-java7']='6'
+['6-java8']='6'
+['7-java7']='7'
+['7-java8']='7'
+['8.0-java7']='8'
+['8.0-java8']='8'
+['8.5-java8']='8'
+['9.0-java8']='9'
+)
+
+declare -A tomcat_version=(
+['6-java7']='6.0.45'
+['6-java8']='6.0.45'
+['7-java7']='7.0.68'
+['7-java8']='7.0.68'
+['8.0-java7']='8.0.33'
+['8.0-java8']='8.0.33'
+['8.5-java8']='8.5.0'
+['9.0-java8']='9.0.0.M4'
+)
 
 generate_dockerfiles() {
-    find . -type d -regex "./[0-9]+.?[0-9]?-java[1-9]" -prune -exec rm -rf {} \;
-    git clone ${TOMCAT_DOCKER_REPO}
-    pushd tomcat > /dev/null
+    for tag in ${!from[@]}; do
+        rm -rf ${tag}
+        mkdir ${tag}
+        cat > ${tag}/Dockerfile <<- EOF
+FROM ${from[${tag}]}
 
-    for version in $(find . -type d -regex "./[1-9]+.?[0-9]?" -printf "%f\n" -prune); do
-        pushd ${version} > /dev/null
-        for jre in *; do
-            sed -i 's/FROM java:7-jre/FROM huitaca\/java:openjdk-7/g' "${jre}/Dockerfile"
-            sed -i 's/FROM java:8-jre/FROM huitaca\/java:openjdk-8/g' "${jre}/Dockerfile"
-            sed -i '/^CMD/d' "${jre}/Dockerfile"
-            sed -i 's/^EXPOSE 8080/EXPOSE 80\nCOPY .\/.s2i\/bin\/ ${STI_SCRIPTS_PATH}/g' "${jre}/Dockerfile"
-            sed -i 's/\/usr\/local\/tomcat/\${HOME}\/tomcat/g' "${jre}/Dockerfile"
+ENV CATALINA_HOME=\${HOME}/tomcat \\
+    PATH=\${CATALINA_HOME}/bin:\${PATH} \\
+    TOMCAT_MAJOR=${tomcat_major[${tag}]} \\
+    TOMCAT_VERSION=${tomcat_version[${tag}]} \\
+    TOMCAT_TGZ_URL=https://www.apache.org/dist/tomcat/tomcat-\${TOMCAT_MAJOR}/v\${TOMCAT_VERSION}/bin/apache-tomcat-\${TOMCAT_VERSION}.tar.gz
 
-            local_version="../../${version}-${jre/jre/java}"
-            mv ${jre} ${local_version}
-            shopt -s dotglob
-            cp -r ../../.template/* ${local_version}
-        done
-        popd > /dev/null
+RUN mkdir -p "\${CATALINA_HOME}"
+WORKDIR \${CATALINA_HOME}
+
+# see https://www.apache.org/dist/tomcat/tomcat-8/KEYS
+RUN set -ex \\
+    && for key in \\
+        05AB33110949707C93A279E3D3EFE6B686867BA6 \\
+        07E48665A34DCAFAE522E5E6266191C37C037D42 \\
+        47309207D818FFD8DCD3F83F1931D684307A10A5 \\
+        541FBE7D8F78B25E055DDEE13C370389288584E7 \\
+        61B832AC2F1C5A90F0F9B00A1C506407564C17A3 \\
+        79F7026C690BAA50B92CD8B66A3AD3F4F22C4FED \\
+        80FF76D88A969FE46108558A80B953A041E49465 \\
+        8B39757B1D8A994DF2433ED58B3A601F08C975E5 \\
+        A27677289986DB50844682F8ACB77FC2E86E29AC \\
+        A9C5DF4D22E99998D9875A5110C01C5A2F6059E7 \\
+        B3F49CD3B9BD2996DA90F817ED3873F5D3262722 \\
+        DCFD35E0BF8CA7344752DE8B6FB21E8933C60243 \\
+        F3A04C595DB5B6A5F1ECA43E3B7BBB100D811BBE \\
+        F7DA48BB64BCB84ECBA7EE6935CD23C10D498E23 \\
+    ; do \\
+        gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "\$key"; \\
+    done \\
+    && curl -fSL "\${TOMCAT_TGZ_URL}" -o tomcat.tar.gz \\
+    && curl -fSL "\${TOMCAT_TGZ_URL}.asc" -o tomcat.tar.gz.asc \\
+    && gpg --batch --verify tomcat.tar.gz.asc tomcat.tar.gz \\
+    && tar -xvf tomcat.tar.gz --strip-components=1 \\
+    && rm bin/*.bat \\
+    && rm tomcat.tar.gz*
+
+COPY ./.s2i/bin/ \${STI_SCRIPTS_PATH}
+
+EXPOSE 8080
+EOF
+        shopt -s dotglob
+        cp -r .template/* ${tag}
     done
-
-    popd > /dev/null
-    rm -rf tomcat
 }
 
 generate_dockerfiles "$@"

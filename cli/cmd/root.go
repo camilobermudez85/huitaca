@@ -15,13 +15,22 @@
 package cmd
 
 import (
-	"bitbucket.org/camilobermudez/huitaca/utils"
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"io/ioutil"
+	"log"
 	"os"
 )
 
-var cfgFile string
+//var cfgFile string
+var verbose bool
+
+var VerboseLogger *log.Logger
+
+var projectConfig = viper.New()
+var effectiveConfig = viper.New()
+var wd string
 
 // This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -50,7 +59,7 @@ func init() {
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 
-	RootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "", "config file (default is $HOME/.huitaca.yaml)")
+	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Make the operation more talkative")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	// RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
@@ -58,7 +67,34 @@ func init() {
 
 func initConfig() {
 
-	utils.InitConfig()
-	fmt.Println(utils.GetConfig().AllKeys())
+	// Init loggers
+	if verbose {
+		VerboseLogger = log.New(os.Stderr, "* ", 0)
+	} else {
+		VerboseLogger = log.New(ioutil.Discard, "", 0)
+	}
 
+	// Init working dir and project config
+	wd, err := os.Getwd()
+	if err != nil {
+		VerboseLogger.Panicln("Error resolving current directory.", err)
+	} else {
+		VerboseLogger.Println("Working directory: ", wd)
+	}
+
+	projectConfig.SetConfigFile(wd + "/huitaca")
+	projectConfig.SetConfigType("toml")
+
+	if err := projectConfig.ReadInConfig(); err == nil {
+		VerboseLogger.Println("Huitaca file: ", projectConfig.ConfigFileUsed())
+	} else {
+		VerboseLogger.Panicln("Error parsing huitaca file: ", err)
+	}
+
+	fmt.Println(GetEffectiveConfig().AllKeys())
+
+}
+
+func GetEffectiveConfig() *viper.Viper {
+	return projectConfig
 }

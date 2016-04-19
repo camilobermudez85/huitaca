@@ -1,21 +1,25 @@
-[testApp]
-version="1.7.2"
-java="8"
-tomcat="8.5"
-[testApp.loggers]
-"org.apache.catalina"="DEBUG"
-"javax.management"="DEBUG"
-[testApp.variables]
-urlPagos="http://pagos.com"
-dateFormat="dd/MM/yyyy"
-timeFormat="HH:mm:ss"
-dbHost="${driveMeDb.host}"
-dbPort="${driveMeDb.port}"
-dbVersion="${driveMeDb.version}"
-mongoVersion="${driveMeDb.mongodb}"
-[testAppDb]
-version="1.7.2"
-mongodb="3.2.3"
-[testAppCache]
-version="1.7.2"
-mongodb="3.2.3"
+[test-app]
+    version="1.7.2"
+    java="8"
+    tomcat="8.5"
+
+[test-app.loggers]
+    "org.apache.catalina"="DEBUG"
+    "javax.management"="DEBUG"
+
+[test-app.variables]
+    urlPagos="http://pagos.com"
+    dateFormat="dd/MM/yyyy"
+    timeFormat="HH:mm:ss"
+    dbHost="${driveMeDb.host}"
+    dbPort="${driveMeDb.port}"
+    dbVersion="${driveMeDb.version}"
+    mongoVersion="${driveMeDb.mongodb}"
+
+[test-app-db]
+    version="1.7.2"
+    mongodb="3.2.3"
+
+[test-app-cache]
+    version="1.7.2"
+    mongodb="3.2.3"

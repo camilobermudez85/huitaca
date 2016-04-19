@@ -1,6 +1,7 @@
 #!/bin/bash
 
-go install bitbucket.org/camilobermudez/huitaca/drivers
-go install bitbucket.org/camilobermudez/huitaca/utils
+go install bitbucket.org/camilobermudez/huitaca/handlers
+#go install bitbucket.org/camilobermudez/huitaca/utils
 go install bitbucket.org/camilobermudez/huitaca
 go install bitbucket.org/camilobermudez/huitaca/cmd
+go install bitbucket.org/camilobermudez/huitaca/types
