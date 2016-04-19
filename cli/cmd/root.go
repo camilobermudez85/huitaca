@@ -15,6 +15,8 @@
 package cmd
 
 import (
+	"bitbucket.org/camilobermudez/huitaca/handlers"
+	"bitbucket.org/camilobermudez/huitaca/types"
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -31,6 +33,11 @@ var VerboseLogger *log.Logger
 var projectConfig = viper.New()
 var effectiveConfig = viper.New()
 var wd string
+
+var HandlerChain = []types.Handler{
+	handlers.TomcatHandler{},
+	handlers.JavaHandler{},
+	handlers.DefaultHandler{}}
 
 // This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{

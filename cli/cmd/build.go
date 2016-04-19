@@ -31,6 +31,9 @@ on the current project. If no service is provided all of the existing
 services on the current project will be built.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// TODO: Work your own magic here
+		for _, handler := range HandlerChain {
+			fmt.Println(handler.HandleBuild(GetEffectiveConfig(), cmd))
+		}
 		fmt.Println("build called")
 	},
 }

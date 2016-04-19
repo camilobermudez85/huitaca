@@ -8,21 +8,21 @@ import (
 )
 
 type Handler interface {
-	handleBuild(config *viper.Viper, cmd *cobra.Command) bool
-	build(config *viper.Viper, cmd *cobra.Command) int
+	HandleBuild(config *viper.Viper, cmd *cobra.Command) bool
+	Build(config *viper.Viper, cmd *cobra.Command) int
 
-	handleInspect(config *viper.Viper, cmd *cobra.Command) bool
-	inspect(config *viper.Viper, cmd *cobra.Command) int
+	HandleInspect(config *viper.Viper, cmd *cobra.Command) bool
+	Inspect(config *viper.Viper, cmd *cobra.Command) int
 
-	handleLog(config *viper.Viper, cmd *cobra.Command) bool
-	log(config *viper.Viper, cmd *cobra.Command) int
+	HandleLog(config *viper.Viper, cmd *cobra.Command) bool
+	Log(config *viper.Viper, cmd *cobra.Command) int
 
-	handleRestart(config *viper.Viper, cmd *cobra.Command) bool
-	restart(config *viper.Viper, cmd *cobra.Command) int
+	HandleRestart(config *viper.Viper, cmd *cobra.Command) bool
+	Restart(config *viper.Viper, cmd *cobra.Command) int
 
-	handleRun(config *viper.Viper, cmd *cobra.Command) bool
-	run(config *viper.Viper, cmd *cobra.Command) int
+	HandleRun(config *viper.Viper, cmd *cobra.Command) bool
+	Run(config *viper.Viper, cmd *cobra.Command) int
 
-	handleStop(config *viper.Viper, cmd *cobra.Command) bool
-	stop(config *viper.Viper, cmd *cobra.Command) int
+	HandleStop(config *viper.Viper, cmd *cobra.Command) bool
+	Stop(config *viper.Viper, cmd *cobra.Command) int
 }

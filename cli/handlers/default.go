@@ -9,50 +9,50 @@ import (
 
 type DefaultHandler struct{}
 
-func (handler *DefaultHandler) handleBuild(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler DefaultHandler) HandleBuild(config *viper.Viper, cmd *cobra.Command) bool {
 	return false
 }
 
-func (handler *DefaultHandler) build(config *viper.Viper, cmd *cobra.Command) int {
+func (handler DefaultHandler) Build(config *viper.Viper, cmd *cobra.Command) int {
 	return 1
 }
 
-func (handler *DefaultHandler) handleInspect(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler DefaultHandler) HandleInspect(config *viper.Viper, cmd *cobra.Command) bool {
 	return false
 }
 
-func (handler *DefaultHandler) inspect(config *viper.Viper, cmd *cobra.Command) int {
+func (handler DefaultHandler) Inspect(config *viper.Viper, cmd *cobra.Command) int {
 	return 1
 }
 
-func (handler *DefaultHandler) handleLog(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler DefaultHandler) HandleLog(config *viper.Viper, cmd *cobra.Command) bool {
 	return false
 }
 
-func (handler *DefaultHandler) log(config *viper.Viper, cmd *cobra.Command) int {
+func (handler DefaultHandler) Log(config *viper.Viper, cmd *cobra.Command) int {
 	return 1
 }
 
-func (handler *DefaultHandler) handleRestart(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler DefaultHandler) HandleRestart(config *viper.Viper, cmd *cobra.Command) bool {
 	return false
 }
 
-func (handler *DefaultHandler) restart(config *viper.Viper, cmd *cobra.Command) int {
+func (handler DefaultHandler) Restart(config *viper.Viper, cmd *cobra.Command) int {
 	return 1
 }
 
-func (handler *DefaultHandler) handleRun(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler DefaultHandler) HandleRun(config *viper.Viper, cmd *cobra.Command) bool {
 	return false
 }
 
-func (handler *DefaultHandler) run(config *viper.Viper, cmd *cobra.Command) int {
+func (handler DefaultHandler) Run(config *viper.Viper, cmd *cobra.Command) int {
 	return 1
 }
 
-func (handler *DefaultHandler) handleStop(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler DefaultHandler) HandleStop(config *viper.Viper, cmd *cobra.Command) bool {
 	return false
 }
 
-func (handler *DefaultHandler) stop(config *viper.Viper, cmd *cobra.Command) int {
+func (handler DefaultHandler) Stop(config *viper.Viper, cmd *cobra.Command) int {
 	return 1
 }
