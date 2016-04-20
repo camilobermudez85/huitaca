@@ -24,10 +24,11 @@ import (
 	"os"
 )
 
-//var cfgFile string
 var verbose bool
 
 var VerboseLogger *log.Logger
+var StdErrLogger *log.Logger
+var StdOutLogger *log.Logger
 
 var projectConfig = viper.New()
 var effectiveConfig = viper.New()
@@ -46,7 +47,6 @@ var RootCmd = &cobra.Command{
 Huitaca is a simple, easy to configure, 12-factor-app oriented PaaS that
 seamlessly streamlines the delivery pipeline starting at the development
 environment.`,
-	// Run: func(cmd *cobra.Command, args []string) { fmt.Println("Hello world") },
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -74,6 +74,8 @@ func init() {
 func initConfig() {
 
 	// Init loggers
+	StdErrLogger = log.New(os.Stderr, "", 0)
+	StdOutLogger = log.New(os.Stdout, "", 0)
 	if verbose {
 		VerboseLogger = log.New(os.Stderr, "* ", 0)
 	} else {
@@ -97,8 +99,36 @@ func initConfig() {
 		VerboseLogger.Panicln("Error parsing huitaca file: ", err)
 	}
 
-	fmt.Println(GetEffectiveConfig().AllKeys())
+}
 
+func handleCommand(
+	cmd *cobra.Command,
+	services []string,
+	determinantFunction func(handlers.Handler, *handlers.CommandContext) bool,
+	handlerFunction func(handlers.Handler, *handlers.CommandContext) (error, int)) {
+
+	ctx := handlers.CommandContext{
+		Command:       cmd,
+		Config:        GetEffectiveConfig(),
+		VerboseLogger: VerboseLogger,
+		StdErrLogger:  StdErrLogger,
+		StdOutLogger:  StdOutLogger,
+	}
+
+	for _, service := range services {
+		ctx.Service = service
+		for _, handler := range HandlerChain {
+			if determinantFunction(handler, &ctx) {
+				if err, returnCode := handlerFunction(handler, &ctx); err != nil {
+					StdErrLogger.Println(err.Error())
+					os.Exit(returnCode)
+				} else {
+					os.Exit(returnCode)
+				}
+				break
+			}
+		}
+	}
 }
 
 func GetEffectiveConfig() *viper.Viper {

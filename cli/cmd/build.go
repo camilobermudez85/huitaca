@@ -15,7 +15,7 @@
 package cmd
 
 import (
-	"fmt"
+	"bitbucket.org/camilobermudez/huitaca/handlers"
 	"github.com/spf13/cobra"
 )
 
@@ -27,16 +27,11 @@ Builds executable container image(s) for one or multiple services
 on the current project. If no service is provided all of the existing 
 services on the current project will be built.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		for _, handler := range HandlerChain {
-			if handler.HandleBuild(GetEffectiveConfig(), cmd) {
-				if err := handler.Build(GetEffectiveConfig(), cmd); err != nil {
-					fmt.Println(err.Error())
-				} else {
-					fmt.Println("Build executed!")
-				}
-				break
-			}
-		}
+		handleCommand(
+			cmd,
+			args,
+			handlers.Handler.HandleBuild,
+			handlers.Handler.Build)
 	},
 }
 

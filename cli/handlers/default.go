@@ -2,57 +2,65 @@ package handlers
 
 import (
 	//	"fmt"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	//	"github.com/spf13/cobra"
+	//	"github.com/spf13/viper"
 	//	"os"
+	//	"bitbucket.org/camilobermudez/huitaca/cmd"
+	"errors"
 )
 
 type DefaultHandler struct{}
 
-func (handler DefaultHandler) HandleBuild(config *viper.Viper, cmd *cobra.Command) bool {
-	return false
+func (handler DefaultHandler) HandleBuild(ctx *CommandContext) bool {
+	return true
 }
 
-func (handler DefaultHandler) Build(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler DefaultHandler) Build(ctx *CommandContext) (error, int) {
+	ctx.VerboseLogger.Println("No suitable platform could be found to handle this command")
+	return errors.New("Ooops! The command could not be processed, there's probably something missing in your huitaca file, please check."), 1
 }
 
-func (handler DefaultHandler) HandleInspect(config *viper.Viper, cmd *cobra.Command) bool {
-	return false
+func (handler DefaultHandler) HandleInspect(ctx *CommandContext) bool {
+	return true
 }
 
-func (handler DefaultHandler) Inspect(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler DefaultHandler) Inspect(ctx *CommandContext) (error, int) {
+	ctx.VerboseLogger.Println("No suitable platform could be found to handle this command")
+	return errors.New("Ooops! The command could not be processed, there's probably something missing in your huitaca file, please check."), 1
 }
 
-func (handler DefaultHandler) HandleLog(config *viper.Viper, cmd *cobra.Command) bool {
-	return false
+func (handler DefaultHandler) HandleLog(ctx *CommandContext) bool {
+	return true
 }
 
-func (handler DefaultHandler) Log(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler DefaultHandler) Log(ctx *CommandContext) (error, int) {
+	ctx.VerboseLogger.Println("No suitable platform could be found to handle this command")
+	return errors.New("Ooops! The command could not be processed, there's probably something missing in your huitaca file, please check."), 1
 }
 
-func (handler DefaultHandler) HandleRestart(config *viper.Viper, cmd *cobra.Command) bool {
-	return false
+func (handler DefaultHandler) HandleRestart(ctx *CommandContext) bool {
+	return true
 }
 
-func (handler DefaultHandler) Restart(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler DefaultHandler) Restart(ctx *CommandContext) (error, int) {
+	ctx.VerboseLogger.Println("No suitable platform could be found to handle this command")
+	return errors.New("Ooops! The command could not be processed, there's probably something missing in your huitaca file, please check."), 1
 }
 
-func (handler DefaultHandler) HandleRun(config *viper.Viper, cmd *cobra.Command) bool {
-	return false
+func (handler DefaultHandler) HandleRun(ctx *CommandContext) bool {
+	return true
 }
 
-func (handler DefaultHandler) Run(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler DefaultHandler) Run(ctx *CommandContext) (error, int) {
+	ctx.VerboseLogger.Println("No suitable platform could be found to handle this command")
+	return errors.New("Ooops! The command could not be processed, there's probably something missing in your huitaca file, please check."), 1
 }
 
-func (handler DefaultHandler) HandleStop(config *viper.Viper, cmd *cobra.Command) bool {
-	return false
+func (handler DefaultHandler) HandleStop(ctx *CommandContext) bool {
+	return true
 }
 
-func (handler DefaultHandler) Stop(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler DefaultHandler) Stop(ctx *CommandContext) (error, int) {
+	ctx.VerboseLogger.Println("No suitable platform could be found to handle this command")
+	return errors.New("Ooops! The command could not be processed, there's probably something missing in your huitaca file, please check."), 1
 }

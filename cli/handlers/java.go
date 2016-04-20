@@ -1,58 +1,58 @@
 package handlers
 
 import (
-	//	"fmt"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	//	"os"
+//	"fmt"
+//	"github.com/spf13/cobra"
+//	"github.com/spf13/viper"
+//	"os"
 )
 
 type JavaHandler struct{}
 
-func (handler JavaHandler) HandleBuild(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler JavaHandler) HandleBuild(ctx *CommandContext) bool {
 	return false
 }
 
-func (handler JavaHandler) Build(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler JavaHandler) Build(ctx *CommandContext) (error, int) {
+	return nil, 0
 }
 
-func (handler JavaHandler) HandleInspect(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler JavaHandler) HandleInspect(ctx *CommandContext) bool {
 	return false
 }
 
-func (handler JavaHandler) Inspect(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler JavaHandler) Inspect(ctx *CommandContext) (error, int) {
+	return nil, 0
 }
 
-func (handler JavaHandler) HandleLog(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler JavaHandler) HandleLog(ctx *CommandContext) bool {
 	return false
 }
 
-func (handler JavaHandler) Log(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler JavaHandler) Log(ctx *CommandContext) (error, int) {
+	return nil, 0
 }
 
-func (handler JavaHandler) HandleRestart(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler JavaHandler) HandleRestart(ctx *CommandContext) bool {
 	return false
 }
 
-func (handler JavaHandler) Restart(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler JavaHandler) Restart(ctx *CommandContext) (error, int) {
+	return nil, 0
 }
 
-func (handler JavaHandler) HandleRun(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler JavaHandler) HandleRun(ctx *CommandContext) bool {
 	return false
 }
 
-func (handler JavaHandler) Run(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler JavaHandler) Run(ctx *CommandContext) (error, int) {
+	return nil, 0
 }
 
-func (handler JavaHandler) HandleStop(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler JavaHandler) HandleStop(ctx *CommandContext) bool {
 	return false
 }
 
-func (handler JavaHandler) Stop(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler JavaHandler) Stop(ctx *CommandContext) (error, int) {
+	return nil, 0
 }

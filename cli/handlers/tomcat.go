@@ -2,57 +2,58 @@ package handlers
 
 import (
 	//	"fmt"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"errors"
+	//	"github.com/spf13/cobra"
+	//	"github.com/spf13/viper"
 	//	"os"
 )
 
 type TomcatHandler struct{}
 
-func (handler TomcatHandler) HandleBuild(config *viper.Viper, cmd *cobra.Command) bool {
-	return true
-}
-
-func (handler TomcatHandler) Build(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
-}
-
-func (handler TomcatHandler) HandleInspect(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler TomcatHandler) HandleBuild(ctx *CommandContext) bool {
 	return false
 }
 
-func (handler TomcatHandler) Inspect(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler TomcatHandler) Build(ctx *CommandContext) (error, int) {
+	return errors.New("Method not yet implemented"), 3
 }
 
-func (handler TomcatHandler) HandleLog(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler TomcatHandler) HandleInspect(ctx *CommandContext) bool {
 	return false
 }
 
-func (handler TomcatHandler) Log(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler TomcatHandler) Inspect(ctx *CommandContext) (error, int) {
+	return nil, 0
 }
 
-func (handler TomcatHandler) HandleRestart(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler TomcatHandler) HandleLog(ctx *CommandContext) bool {
 	return false
 }
 
-func (handler TomcatHandler) Restart(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler TomcatHandler) Log(ctx *CommandContext) (error, int) {
+	return nil, 0
 }
 
-func (handler TomcatHandler) HandleRun(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler TomcatHandler) HandleRestart(ctx *CommandContext) bool {
 	return false
 }
 
-func (handler TomcatHandler) Run(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler TomcatHandler) Restart(ctx *CommandContext) (error, int) {
+	return nil, 0
 }
 
-func (handler TomcatHandler) HandleStop(config *viper.Viper, cmd *cobra.Command) bool {
+func (handler TomcatHandler) HandleRun(ctx *CommandContext) bool {
 	return false
 }
 
-func (handler TomcatHandler) Stop(config *viper.Viper, cmd *cobra.Command) error {
-	return nil
+func (handler TomcatHandler) Run(ctx *CommandContext) (error, int) {
+	return nil, 0
+}
+
+func (handler TomcatHandler) HandleStop(ctx *CommandContext) bool {
+	return false
+}
+
+func (handler TomcatHandler) Stop(ctx *CommandContext) (error, int) {
+	return nil, 0
 }

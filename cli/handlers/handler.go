@@ -5,37 +5,35 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	//	"os"
+	//	"bitbucket.org/camilobermudez/huitaca/cmd"
+	"log"
 )
 
-type HandlerError struct {
-	msg  string
-	code int
-}
-
-func (e *HandlerError) Error() string {
-	return e.msg
-}
-
-func (e *HandlerError) Code() int {
-	return e.code
+type CommandContext struct {
+	Service       string
+	Command       *cobra.Command
+	Config        *viper.Viper
+	VerboseLogger *log.Logger
+	StdErrLogger  *log.Logger
+	StdOutLogger  *log.Logger
 }
 
 type Handler interface {
-	HandleBuild(config *viper.Viper, cmd *cobra.Command) bool
-	Build(config *viper.Viper, cmd *cobra.Command) error
+	HandleBuild(ctx *CommandContext) bool
+	Build(ctx *CommandContext) (error, int)
 
-	HandleInspect(config *viper.Viper, cmd *cobra.Command) bool
-	Inspect(config *viper.Viper, cmd *cobra.Command) error
+	HandleInspect(ctx *CommandContext) bool
+	Inspect(ctx *CommandContext) (error, int)
 
-	HandleLog(config *viper.Viper, cmd *cobra.Command) bool
-	Log(config *viper.Viper, cmd *cobra.Command) error
+	HandleLog(ctx *CommandContext) bool
+	Log(ctx *CommandContext) (error, int)
 
-	HandleRestart(config *viper.Viper, cmd *cobra.Command) bool
-	Restart(config *viper.Viper, cmd *cobra.Command) error
+	HandleRestart(ctx *CommandContext) bool
+	Restart(ctx *CommandContext) (error, int)
 
-	HandleRun(config *viper.Viper, cmd *cobra.Command) bool
-	Run(config *viper.Viper, cmd *cobra.Command) error
+	HandleRun(ctx *CommandContext) bool
+	Run(ctx *CommandContext) (error, int)
 
-	HandleStop(config *viper.Viper, cmd *cobra.Command) bool
-	Stop(config *viper.Viper, cmd *cobra.Command) error
+	HandleStop(ctx *CommandContext) bool
+	Stop(ctx *CommandContext) (error, int)
 }
