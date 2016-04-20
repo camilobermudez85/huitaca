@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"bitbucket.org/camilobermudez/huitaca/handlers"
-	"bitbucket.org/camilobermudez/huitaca/types"
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -34,7 +33,7 @@ var projectConfig = viper.New()
 var effectiveConfig = viper.New()
 var wd string
 
-var HandlerChain = []types.Handler{
+var HandlerChain = []handlers.Handler{
 	handlers.TomcatHandler{},
 	handlers.JavaHandler{},
 	handlers.DefaultHandler{}}

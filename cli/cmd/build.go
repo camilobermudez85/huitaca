@@ -20,33 +20,27 @@ import (
 )
 
 var buildCmd = &cobra.Command{
-	Use:   "build",
+	Use:   "build [service...]",
 	Short: "Builds the indicated service(s) image(s)",
 	Long: `
-
-Usage:  hui build [OPTIONS] [SERVICE...]
-
 Builds executable container image(s) for one or multiple services
 on the current project. If no service is provided all of the existing 
 services on the current project will be built.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
 		for _, handler := range HandlerChain {
-			fmt.Println(handler.HandleBuild(GetEffectiveConfig(), cmd))
+			if handler.HandleBuild(GetEffectiveConfig(), cmd) {
+				if err := handler.Build(GetEffectiveConfig(), cmd); err != nil {
+					fmt.Println(err.Error())
+				} else {
+					fmt.Println("Build executed!")
+				}
+				break
+			}
 		}
-		fmt.Println("build called")
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(buildCmd)
-	// Here you will define your flags and configuration settings.
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// buildCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
 	// buildCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
 }

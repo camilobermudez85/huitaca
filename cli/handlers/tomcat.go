@@ -10,49 +10,49 @@ import (
 type TomcatHandler struct{}
 
 func (handler TomcatHandler) HandleBuild(config *viper.Viper, cmd *cobra.Command) bool {
-	return false
+	return true
 }
 
-func (handler TomcatHandler) Build(config *viper.Viper, cmd *cobra.Command) int {
-	return 1
+func (handler TomcatHandler) Build(config *viper.Viper, cmd *cobra.Command) error {
+	return nil
 }
 
 func (handler TomcatHandler) HandleInspect(config *viper.Viper, cmd *cobra.Command) bool {
 	return false
 }
 
-func (handler TomcatHandler) Inspect(config *viper.Viper, cmd *cobra.Command) int {
-	return 1
+func (handler TomcatHandler) Inspect(config *viper.Viper, cmd *cobra.Command) error {
+	return nil
 }
 
 func (handler TomcatHandler) HandleLog(config *viper.Viper, cmd *cobra.Command) bool {
 	return false
 }
 
-func (handler TomcatHandler) Log(config *viper.Viper, cmd *cobra.Command) int {
-	return 1
+func (handler TomcatHandler) Log(config *viper.Viper, cmd *cobra.Command) error {
+	return nil
 }
 
 func (handler TomcatHandler) HandleRestart(config *viper.Viper, cmd *cobra.Command) bool {
 	return false
 }
 
-func (handler TomcatHandler) Restart(config *viper.Viper, cmd *cobra.Command) int {
-	return 1
+func (handler TomcatHandler) Restart(config *viper.Viper, cmd *cobra.Command) error {
+	return nil
 }
 
 func (handler TomcatHandler) HandleRun(config *viper.Viper, cmd *cobra.Command) bool {
 	return false
 }
 
-func (handler TomcatHandler) Run(config *viper.Viper, cmd *cobra.Command) int {
-	return 1
+func (handler TomcatHandler) Run(config *viper.Viper, cmd *cobra.Command) error {
+	return nil
 }
 
 func (handler TomcatHandler) HandleStop(config *viper.Viper, cmd *cobra.Command) bool {
 	return false
 }
 
-func (handler TomcatHandler) Stop(config *viper.Viper, cmd *cobra.Command) int {
-	return 1
+func (handler TomcatHandler) Stop(config *viper.Viper, cmd *cobra.Command) error {
+	return nil
 }
