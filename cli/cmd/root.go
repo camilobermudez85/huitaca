@@ -16,7 +16,9 @@ package cmd
 
 import (
 	"bitbucket.org/camilobermudez/huitaca/handlers"
+	"bitbucket.org/camilobermudez/huitaca/utils"
 	"fmt"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"io/ioutil"
@@ -24,14 +26,17 @@ import (
 	"os"
 )
 
+const huitacaFile string = "huitaca"
+
 var verbose bool
+var debug bool
 
 var VerboseLogger *log.Logger
+var DebugLogger *log.Logger
 var StdErrLogger *log.Logger
 var StdOutLogger *log.Logger
 
-var projectConfig = viper.New()
-var effectiveConfig = viper.New()
+var Config = viper.New()
 var wd string
 
 var HandlerChain = []handlers.Handler{
@@ -66,6 +71,8 @@ func init() {
 	// will be global for your application.
 
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Make the operation more talkative")
+	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "x", false, "Enable debugging, much more verbose output")
+
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	// RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
@@ -74,29 +81,51 @@ func init() {
 func initConfig() {
 
 	// Init loggers
+	spew.Config.Indent = "    "
 	StdErrLogger = log.New(os.Stderr, "", 0)
 	StdOutLogger = log.New(os.Stdout, "", 0)
-	if verbose {
+	if verbose || debug {
 		VerboseLogger = log.New(os.Stderr, "* ", 0)
 	} else {
 		VerboseLogger = log.New(ioutil.Discard, "", 0)
 	}
+	if debug {
+		DebugLogger = log.New(os.Stderr, "*** ", 0)
+	} else {
+		DebugLogger = log.New(ioutil.Discard, "", 0)
+	}
 
-	// Init working dir and project config
+	// Init working directory
 	wd, err := os.Getwd()
 	if err != nil {
-		VerboseLogger.Panicln("Error resolving current directory.", err)
+		VerboseLogger.Println("Error resolving current directory: " + err.Error())
+		DebugLogger.Println(err)
+		os.Exit(1)
 	} else {
 		VerboseLogger.Println("Working directory: ", wd)
 	}
 
-	projectConfig.SetConfigFile(wd + "/huitaca")
-	projectConfig.SetConfigType("toml")
-
-	if err := projectConfig.ReadInConfig(); err == nil {
-		VerboseLogger.Println("Huitaca file: ", projectConfig.ConfigFileUsed())
+	// Load the global configuration
+	Config.SetConfigFile(utils.GlobalHuitacaFile)
+	Config.SetConfigType("toml")
+	if err := Config.ReadInConfig(); err == nil {
+		VerboseLogger.Println("Huitaca global file: ", Config.ConfigFileUsed())
+		DebugLogger.Println("global config:\n" + spew.Sdump(Config.AllSettings()))
 	} else {
-		VerboseLogger.Panicln("Error parsing huitaca file: ", err)
+		VerboseLogger.Println("Error parsing global huitaca file: " + err.Error())
+		DebugLogger.Println(err)
+		os.Exit(1)
+	}
+
+	// Now load and merge in the project configuration
+	Config.SetConfigFile(wd + string(os.PathSeparator) + utils.HuitacaFileName)
+	if err := Config.MergeInConfig(); err == nil {
+		VerboseLogger.Println("Huitaca project file: ", Config.ConfigFileUsed())
+		DebugLogger.Println("Effective config:\n" + spew.Sdump(Config.AllSettings()))
+	} else {
+		VerboseLogger.Println("Error parsing project huitaca file: " + err.Error())
+		DebugLogger.Println(err)
+		os.Exit(1)
 	}
 
 }
@@ -109,7 +138,7 @@ func handleCommand(
 
 	ctx := handlers.CommandContext{
 		Command:       cmd,
-		Config:        GetEffectiveConfig(),
+		Config:        Config,
 		VerboseLogger: VerboseLogger,
 		StdErrLogger:  StdErrLogger,
 		StdOutLogger:  StdOutLogger,
@@ -129,8 +158,4 @@ func handleCommand(
 			}
 		}
 	}
-}
-
-func GetEffectiveConfig() *viper.Viper {
-	return projectConfig
 }
