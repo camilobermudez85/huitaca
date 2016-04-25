@@ -17,16 +17,26 @@ package cmd
 import (
 	"bitbucket.org/camilobermudez/huitaca/handlers"
 	//	"github.com/davecgh/go-spew/spew"
+	//	"fmt"
+	//	"github.com/davecgh/go-spew/spew"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 // inspectCmd represents the inspect command
 var inspectCmd = &cobra.Command{
-	Use:   "inspect service",
-	Short: "Inspect properties for a specific service",
+	Use:   "inspect [service]",
+	Short: "Inspects properties for a specific service",
 	Long: `
-on.`,
+Inspects a service properties, only one service at a time.
+If no service is specified inspects the properties of the project.`,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		if len(args) > 1 {
+			StdErrLogger.Println("Error: No more than one service can be inspected at once.")
+			os.Exit(1)
+		}
+
 		handleCommand(
 			cmd,
 			args,
@@ -34,17 +44,21 @@ on.`,
 			handlers.Handler.Inspect)
 	},
 }
+
 var tags []string
+var follow bool
+var list bool
 
 func init() {
 
 	RootCmd.AddCommand(inspectCmd)
 
-	inspectCmd.Flags().StringSliceVarP(
-		&tags,
-		"tag",
-		"t",
-		[]string{"id", "ip", "port"},
-		"The property tag(s) or key(s) to be inspected")
+	inspectCmd.Flags().StringSliceVarP(&tags, "tag", "t", []string{"id", "ip", "port"},
+		"The property key(s) to be inspected")
 
+	inspectCmd.Flags().BoolVarP(&follow, "follow", "f", false,
+		"Output inspected value(s) at regular intervals")
+
+	inspectCmd.Flags().BoolVarP(&list, "list", "l", false,
+		"List the inspectable keys for the provided service")
 }

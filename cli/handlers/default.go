@@ -7,7 +7,7 @@ import (
 	//	"os"
 	//	"bitbucket.org/camilobermudez/huitaca/cmd"
 	"errors"
-	"github.com/davecgh/go-spew/spew"
+	//	"github.com/davecgh/go-spew/spew"
 )
 
 type DefaultHandler struct{}
@@ -26,7 +26,6 @@ func (handler DefaultHandler) HandleInspect(ctx *CommandContext) bool {
 }
 
 func (handler DefaultHandler) Inspect(ctx *CommandContext) (error, int) {
-	ctx.VerboseLogger.Println(spew.Sdump(ctx.Command.Flags().GetStringSlice("tag")))
 	ctx.VerboseLogger.Println("No suitable platform could be found to handle this command")
 	return errors.New("Ooops! The command could not be processed, there's probably something missing in your huitaca file, please check."), 1
 }

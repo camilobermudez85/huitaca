@@ -145,6 +145,10 @@ func handleCommand(
 	}
 
 	for _, service := range services {
+		if !Config.IsSet(service) {
+			StdErrLogger.Println("Error: Service '" + service + "' not found")
+			os.Exit(1)
+		}
 		ctx.Service = service
 		for _, handler := range HandlerChain {
 			if determinantFunction(handler, &ctx) {

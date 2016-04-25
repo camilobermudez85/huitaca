@@ -1,10 +1,10 @@
 package handlers
 
 import (
-//	"fmt"
-//	"github.com/spf13/cobra"
-//	"github.com/spf13/viper"
-//	"os"
+	//	"fmt"
+	//	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	//	"os"
 )
 
 type JavaHandler struct{}
@@ -55,4 +55,8 @@ func (handler JavaHandler) HandleStop(ctx *CommandContext) bool {
 
 func (handler JavaHandler) Stop(ctx *CommandContext) (error, int) {
 	return nil, 0
+}
+
+func isAJavaService(service string, config *viper.Viper) bool {
+	return false
 }
