@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	//	"fmt"
-	//	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	//	"os"
+//	"fmt"
+//	"github.com/spf13/cobra"
+//	"github.com/spf13/viper"
+//	"os"
+//	"github.com/openshift/source-to-image/pkg/api"
 )
 
 type JavaHandler struct{}
@@ -14,6 +15,11 @@ func (handler JavaHandler) HandleBuild(ctx *CommandContext) bool {
 }
 
 func (handler JavaHandler) Build(ctx *CommandContext) (error, int) {
+
+	//	s2iConfig := api.Config{
+	//		DisplayName: "abc",
+	//	}
+
 	return nil, 0
 }
 
@@ -57,9 +63,11 @@ func (handler JavaHandler) Stop(ctx *CommandContext) (error, int) {
 	return nil, 0
 }
 
-func isAJavaService(service string, config *viper.Viper) bool {
-	if _, ok := config.GetStringMapString(service)["java"]; ok {
-		return true
+func isAJavaService(service string, config map[string]interface{}) bool {
+	if serviceMap, rightType := config[service].(map[string]string); rightType {
+		if _, found := serviceMap["java"]; found {
+			return true
+		}
 	}
 	return false
 }

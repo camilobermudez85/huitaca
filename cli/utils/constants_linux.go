@@ -19,3 +19,16 @@ import ()
 const (
 	GlobalHuitacaFile string = "/etc/" + HuitacaFileName
 )
+
+var ConfigDefaults = map[string]interface{}{
+
+	"huitaca": map[string]interface{}{
+
+		"docker": map[string]interface{}{
+			"endPoint": "/var/run/docker.sock",
+			"certFile": "/abc",
+			"keyFile":  "",
+			"CAFile":   "",
+		},
+	},
+}

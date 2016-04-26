@@ -3,7 +3,7 @@ package handlers
 import (
 	//	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	//	"github.com/spf13/viper"
 	//	"os"
 	//	"bitbucket.org/camilobermudez/huitaca/cmd"
 	"log"
@@ -12,7 +12,7 @@ import (
 type CommandContext struct {
 	Service       string
 	Command       *cobra.Command
-	Config        *viper.Viper
+	Config        map[string]interface{}
 	VerboseLogger *log.Logger
 	StdErrLogger  *log.Logger
 	StdOutLogger  *log.Logger

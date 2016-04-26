@@ -36,7 +36,7 @@ var DebugLogger *log.Logger
 var StdErrLogger *log.Logger
 var StdOutLogger *log.Logger
 
-var Config = viper.New()
+var Config = map[string]interface{}{}
 var wd string
 
 var HandlerChain = []handlers.Handler{
@@ -105,12 +105,17 @@ func initConfig() {
 		VerboseLogger.Println("Working directory: ", wd)
 	}
 
-	// Load the global configuration
-	Config.SetConfigFile(utils.GlobalHuitacaFile)
-	Config.SetConfigType("toml")
-	if err := Config.ReadInConfig(); err == nil {
-		VerboseLogger.Println("Huitaca global file: ", Config.ConfigFileUsed())
-		DebugLogger.Println("global config:\n" + spew.Sdump(Config.AllSettings()))
+	// Load the default configuration
+	deepMerge(Config, utils.ConfigDefaults)
+
+	// Merge in the global configuration
+	globalConfig := viper.New()
+	globalConfig.SetConfigFile(utils.GlobalHuitacaFile)
+	globalConfig.SetConfigType("toml")
+	if err := globalConfig.ReadInConfig(); err == nil {
+		VerboseLogger.Println("Huitaca global file: ", globalConfig.ConfigFileUsed())
+		DebugLogger.Println("global config:\n" + spew.Sdump(globalConfig.AllSettings()))
+		deepMerge(Config, (globalConfig.AllSettings()))
 	} else {
 		VerboseLogger.Println("Error parsing global huitaca file: " + err.Error())
 		DebugLogger.Println(err)
@@ -118,10 +123,13 @@ func initConfig() {
 	}
 
 	// Now load and merge in the project configuration
-	Config.SetConfigFile(wd + string(os.PathSeparator) + utils.HuitacaFileName)
-	if err := Config.MergeInConfig(); err == nil {
-		VerboseLogger.Println("Huitaca project file: ", Config.ConfigFileUsed())
-		DebugLogger.Println("Effective config:\n" + spew.Sdump(Config.AllSettings()))
+	projectConfig := viper.New()
+	projectConfig.SetConfigFile(wd + string(os.PathSeparator) + utils.HuitacaFileName)
+	projectConfig.SetConfigType("toml")
+	if err := projectConfig.ReadInConfig(); err == nil {
+		VerboseLogger.Println("Huitaca project file: ", projectConfig.ConfigFileUsed())
+		deepMerge(Config, projectConfig.AllSettings())
+		DebugLogger.Println("Effective config:\n" + spew.Sdump(Config))
 	} else {
 		VerboseLogger.Println("Error parsing project huitaca file: " + err.Error())
 		DebugLogger.Println(err)
@@ -145,7 +153,7 @@ func handleCommand(
 	}
 
 	for _, service := range services {
-		if !Config.IsSet(service) {
+		if _, found := Config[service]; !found {
 			StdErrLogger.Println("Error: Service '" + service + "' not found")
 			os.Exit(1)
 		}
@@ -160,6 +168,28 @@ func handleCommand(
 				}
 				break
 			}
+		}
+	}
+}
+
+func deepMerge(dst map[string]interface{}, src map[string]interface{}) {
+
+	for k, srcValue := range src {
+		switch srcValue.(type) {
+		case map[string]interface{}:
+			if dstValue, exists := dst[k]; !exists {
+				dst[k] = srcValue
+			} else {
+				switch dstValue.(type) {
+				case string:
+					dst[k] = srcValue
+				case map[string]interface{}:
+					deepMerge(dstValue.(map[string]interface{}),
+						srcValue.(map[string]interface{}))
+				}
+			}
+		case string:
+			dst[k] = srcValue
 		}
 	}
 }
