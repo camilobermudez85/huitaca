@@ -27,7 +27,7 @@ var ConfigDefaults = map[string]interface{}{
 	"huitaca": map[string]interface{}{
 
 		"docker": map[string]interface{}{
-			"endPoint": "/var/run/docker.sock",
+			"endpoint": "/var/run/docker.sock",
 			"certFile": "/abc",
 			"keyFile":  "",
 			"CAFile":   "",

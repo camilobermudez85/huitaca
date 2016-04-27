@@ -1,14 +1,21 @@
 package handlers
 
 import (
-//	"fmt"
-//	"github.com/spf13/cobra"
-//	"github.com/spf13/viper"
-//	"os"
-//	"github.com/openshift/source-to-image/pkg/api"
+	//	"fmt"
+	//	"github.com/spf13/cobra"
+	//	"github.com/spf13/viper"
+	//	"os"
+	//	"strings"
+	"errors"
+	"github.com/openshift/source-to-image/pkg/api"
 )
 
 type JavaHandler struct{}
+
+var builderImages = map[string]string{
+	"7": "huitaca/java:open-jdk-7",
+	"8": "huitaca/java:open-jdk-8",
+}
 
 func (handler JavaHandler) HandleBuild(ctx *CommandContext) bool {
 	return isAJavaService(ctx.Service, ctx.Config)
@@ -16,9 +23,19 @@ func (handler JavaHandler) HandleBuild(ctx *CommandContext) bool {
 
 func (handler JavaHandler) Build(ctx *CommandContext) (error, int) {
 
-	//	s2iConfig := api.Config{
-	//		DisplayName: "abc",
-	//	}
+	serviceConfig := ctx.Config[service].(map[string]interface{})
+	s2iConfig := api.Config{
+		DisplayName: getString(serviceConfig, []string{"displayName"}),
+		Description: getString(serviceConfig, []string{"description"}),
+	}
+
+	javaVersion, _ := getString(serviceConfig, []string{"java"})
+	if builderImage, ok := builderImages[javaVersion]; ok {
+		s2iConfig.BuilderImage = builderImage
+		ctx.VerboseLogger.Println("Using builder image '" + builderImage + "'")
+	} else {
+		return errors.New("Error: Java version '" + javaVersion + "' not found"), 1
+	}
 
 	return nil, 0
 }
@@ -64,10 +81,8 @@ func (handler JavaHandler) Stop(ctx *CommandContext) (error, int) {
 }
 
 func isAJavaService(service string, config map[string]interface{}) bool {
-	if serviceMap, rightType := config[service].(map[string]string); rightType {
-		if _, found := serviceMap["java"]; found {
-			return true
-		}
+	if _, found := getString(config, []string{service, "java"}); found {
+		return true
 	}
 	return false
 }

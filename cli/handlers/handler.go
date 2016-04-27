@@ -37,3 +37,22 @@ type Handler interface {
 	HandleStop(ctx *CommandContext) bool
 	Stop(ctx *CommandContext) (error, int)
 }
+
+func getString(m map[string]interface{}, path []string) (string, bool) {
+	var v interface{} = m
+	var found bool
+	for i, k := range path {
+		v, found = v.(map[string]interface{})[k]
+		if !found {
+			break
+		}
+		switch v.(type) {
+		case string:
+			if i == len(path)-1 {
+				return v.(string), true
+			}
+			break
+		}
+	}
+	return "", false
+}
