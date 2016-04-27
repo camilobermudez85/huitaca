@@ -7,7 +7,7 @@ import (
 	//	"os"
 	//	"strings"
 	"errors"
-	"github.com/openshift/source-to-image/pkg/api"
+	//	"github.com/openshift/source-to-image/pkg/api"
 )
 
 type JavaHandler struct{}
@@ -23,13 +23,10 @@ func (handler JavaHandler) HandleBuild(ctx *CommandContext) bool {
 
 func (handler JavaHandler) Build(ctx *CommandContext) (error, int) {
 
-	serviceConfig := ctx.Config[service].(map[string]interface{})
-	s2iConfig := api.Config{
-		DisplayName: getString(serviceConfig, []string{"displayName"}),
-		Description: getString(serviceConfig, []string{"description"}),
-	}
+	serviceConfig := ctx.Config[ctx.Service].(map[string]interface{})
+	s2iConfig := buildS2iConfig(ctx.Service, ctx.Config)
 
-	javaVersion, _ := getString(serviceConfig, []string{"java"})
+	javaVersion := getString(serviceConfig, []string{"java"})
 	if builderImage, ok := builderImages[javaVersion]; ok {
 		s2iConfig.BuilderImage = builderImage
 		ctx.VerboseLogger.Println("Using builder image '" + builderImage + "'")
@@ -81,8 +78,5 @@ func (handler JavaHandler) Stop(ctx *CommandContext) (error, int) {
 }
 
 func isAJavaService(service string, config map[string]interface{}) bool {
-	if _, found := getString(config, []string{service, "java"}); found {
-		return true
-	}
-	return false
+	return getString(config, []string{service, "java"}) != ""
 }

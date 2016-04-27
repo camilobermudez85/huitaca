@@ -6,6 +6,7 @@ import (
 	//	"github.com/spf13/viper"
 	//	"os"
 	//	"bitbucket.org/camilobermudez/huitaca/cmd"
+	"github.com/openshift/source-to-image/pkg/api"
 	"log"
 )
 
@@ -38,7 +39,31 @@ type Handler interface {
 	Stop(ctx *CommandContext) (error, int)
 }
 
-func getString(m map[string]interface{}, path []string) (string, bool) {
+func buildS2iConfig(service string, config map[string]interface{}) *api.Config {
+
+	serviceConfig := config[service].(map[string]interface{})
+	s2iConfig := api.Config{
+		DisplayName:   getString(serviceConfig, []string{"displayName"}),
+		Description:   getString(serviceConfig, []string{"description"}),
+		DockerConfig:  buildDockerConfig(config),
+		DockerCfgPath: getString(config, []string{"huitaca", "docker", "dockerCfgPath"}),
+	}
+
+	return &s2iConfig
+
+}
+
+func buildDockerConfig(config map[string]interface{}) *api.DockerConfig {
+
+	return &api.DockerConfig{
+		Endpoint: getString(config, []string{"huitaca", "docker", "endpoint"}),
+		CertFile: getString(config, []string{"huitaca", "docker", "certFile"}),
+		KeyFile:  getString(config, []string{"huitaca", "docker", "keyFile"}),
+		CAFile:   getString(config, []string{"huitaca", "docker", "CAFile"}),
+	}
+}
+
+func getString(m map[string]interface{}, path []string) string {
 	var v interface{} = m
 	var found bool
 	for i, k := range path {
@@ -49,10 +74,10 @@ func getString(m map[string]interface{}, path []string) (string, bool) {
 		switch v.(type) {
 		case string:
 			if i == len(path)-1 {
-				return v.(string), true
+				return v.(string)
 			}
 			break
 		}
 	}
-	return "", false
+	return ""
 }
