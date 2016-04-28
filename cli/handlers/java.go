@@ -34,6 +34,8 @@ func (handler JavaHandler) Build(ctx *CommandContext) (error, int) {
 		return errors.New("Error: Java version '" + javaVersion + "' not found"), 1
 	}
 
+	//	gitRef := ctx.Command.Flags(). ...
+
 	return nil, 0
 }
 

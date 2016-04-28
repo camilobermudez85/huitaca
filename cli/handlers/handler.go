@@ -47,6 +47,15 @@ func buildS2iConfig(service string, config map[string]interface{}) *api.Config {
 		Description:   getString(serviceConfig, []string{"description"}),
 		DockerConfig:  buildDockerConfig(config),
 		DockerCfgPath: getString(config, []string{"huitaca", "docker", "dockerCfgPath"}),
+		// PullAuthentication: ...
+		// IncrementalAuthentication: ...
+		// DockerNetworkMode: ...
+		PreserveWorkingDir: true,
+		DisableRecursive:   false,
+		Source:             os.Getwd(),
+		//Ref: ... Defined from a flag at the platform
+		//Tag: ... Defined at the platform
+		BuilderPullPolicy: api.PullIfNotPresent,
 	}
 
 	return &s2iConfig

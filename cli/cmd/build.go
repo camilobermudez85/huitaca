@@ -37,5 +37,7 @@ services on the current project will be built.`,
 
 func init() {
 	RootCmd.AddCommand(buildCmd)
+	logCmd.Flags().StringVar(new(string), "git-ref", false,
+		"Optionally provide a git ref to use to build the image")
 	// buildCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
