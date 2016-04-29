@@ -6,6 +6,7 @@ import (
 	//	"github.com/spf13/viper"
 	//	"os"
 	//	"bitbucket.org/camilobermudez/huitaca/cmd"
+	"bitbucket.org/camilobermudez/huitaca/utils"
 	"github.com/openshift/source-to-image/pkg/api"
 	"log"
 )
@@ -39,9 +40,9 @@ type Handler interface {
 	Stop(ctx *CommandContext) (error, int)
 }
 
-func buildS2iConfig(service string, config map[string]interface{}) *api.Config {
+func buildS2iConfig(ctx *CommandContext) *api.Config {
 
-	serviceConfig := config[service].(map[string]interface{})
+	serviceConfig := ctx.Config[ctx.Service].(map[string]interface{})
 	s2iConfig := api.Config{
 		DisplayName:   getString(serviceConfig, []string{"displayName"}),
 		Description:   getString(serviceConfig, []string{"description"}),
@@ -53,13 +54,23 @@ func buildS2iConfig(service string, config map[string]interface{}) *api.Config {
 		PreserveWorkingDir: true,
 		DisableRecursive:   false,
 		Source:             os.Getwd(),
-		//Ref: ... Defined from a flag at the platform
 		//Tag: ... Defined at the platform
-		BuilderPullPolicy: api.PullIfNotPresent,
+		BuilderPullPolicy:       api.PullIfNotPresent,
+		PreviousImagePullPolicy: api.PullIfNotPresent,
+		Incremental:             true,
+		RemovePreviousImage:     false,
+	}
+
+	if gitRef, err := ctx.Command.GetString("git-ref"); err == nil {
+		s2iConfig.Ref = gitRef
+	}
+
+	s2iConfig.Tag = ctx.Service + ":" + utils.WdHash
+	if imageTag, err := ctx.Command.GetString("image-tag"); err == nil {
+		s2iConfig.Tag = imageTag
 	}
 
 	return &s2iConfig
-
 }
 
 func buildDockerConfig(config map[string]interface{}) *api.DockerConfig {

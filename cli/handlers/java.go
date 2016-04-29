@@ -7,7 +7,8 @@ import (
 	//	"os"
 	//	"strings"
 	"errors"
-	//	"github.com/openshift/source-to-image/pkg/api"
+	"github.com/openshift/source-to-image/pkg/api"
+	"github.com/openshift/source-to-image/pkg/build/strategies/sti"
 )
 
 type JavaHandler struct{}
@@ -34,7 +35,12 @@ func (handler JavaHandler) Build(ctx *CommandContext) (error, int) {
 		return errors.New("Error: Java version '" + javaVersion + "' not found"), 1
 	}
 
-	//	gitRef := ctx.Command.Flags(). ...
+	if stiStruct, err := sti.New(s2iConfig, nil); err == null {
+		if result, err := stiStruct.Build(s2iConfig); err == null {
+		} else {
+		}
+	} else {
+	}
 
 	return nil, 0
 }

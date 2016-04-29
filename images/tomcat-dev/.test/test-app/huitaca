@@ -2,7 +2,7 @@
     description="Image display-name label"
     displayName="Image description label"
     version="1.7.2"
-    java="7 "
+    java="7"
     tomcat="8.5"
 
 [test-app.loggers]
