@@ -14,14 +14,10 @@
 
 package utils
 
-import (
-	"crypto/md5"
-	"os"
-)
+import ()
 
 const (
 	GlobalHuitacaFile string = "/etc/" + HuitacaFileName
-	WdHash            string = string(md5.Sum([]byte(os.Getwd())))
 )
 
 var ConfigDefaults = map[string]interface{}{

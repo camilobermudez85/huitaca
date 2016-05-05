@@ -7,7 +7,9 @@ import (
 	//	"os"
 	//	"strings"
 	"errors"
-	"github.com/openshift/source-to-image/pkg/api"
+	//"github.com/openshift/source-to-image/pkg/api"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/openshift/source-to-image/pkg/build"
 	"github.com/openshift/source-to-image/pkg/build/strategies/sti"
 )
 
@@ -25,7 +27,7 @@ func (handler JavaHandler) HandleBuild(ctx *CommandContext) bool {
 func (handler JavaHandler) Build(ctx *CommandContext) (error, int) {
 
 	serviceConfig := ctx.Config[ctx.Service].(map[string]interface{})
-	s2iConfig := buildS2iConfig(ctx.Service, ctx.Config)
+	s2iConfig := buildS2iConfig(ctx)
 
 	javaVersion := getString(serviceConfig, []string{"java"})
 	if builderImage, ok := builderImages[javaVersion]; ok {
@@ -35,9 +37,12 @@ func (handler JavaHandler) Build(ctx *CommandContext) (error, int) {
 		return errors.New("Error: Java version '" + javaVersion + "' not found"), 1
 	}
 
-	if stiStruct, err := sti.New(s2iConfig, nil); err == null {
-		if result, err := stiStruct.Build(s2iConfig); err == null {
+	ctx.VerboseLogger.Println(spew.Sdump(s2iConfig))
+	if stiStruct, err := sti.New(s2iConfig, build.Overrides{}); err == nil {
+		if result, err := stiStruct.Build(s2iConfig); err != nil {
+			panic(err)
 		} else {
+			ctx.VerboseLogger.Println(spew.Sdump(result))
 		}
 	} else {
 	}

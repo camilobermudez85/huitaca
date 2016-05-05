@@ -14,8 +14,29 @@
 
 package utils
 
-import ()
+import (
+	"crypto/md5"
+	"encoding/hex"
+	"os"
+)
 
 const (
 	HuitacaFileName string = "huitaca"
 )
+
+func GetwdHash() string {
+	if wd, err := os.Getwd(); err != nil {
+		panic(err)
+	} else {
+		sum := md5.Sum([]byte(wd))
+		return hex.EncodeToString(sum[:])
+	}
+}
+
+func Getwd() string {
+	if wd, err := os.Getwd(); err != nil {
+		panic(err)
+	} else {
+		return wd
+	}
+}

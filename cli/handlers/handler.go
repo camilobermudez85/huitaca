@@ -4,7 +4,7 @@ import (
 	//	"fmt"
 	"github.com/spf13/cobra"
 	//	"github.com/spf13/viper"
-	//	"os"
+	//"os"
 	//	"bitbucket.org/camilobermudez/huitaca/cmd"
 	"bitbucket.org/camilobermudez/huitaca/utils"
 	"github.com/openshift/source-to-image/pkg/api"
@@ -46,14 +46,14 @@ func buildS2iConfig(ctx *CommandContext) *api.Config {
 	s2iConfig := api.Config{
 		DisplayName:   getString(serviceConfig, []string{"displayName"}),
 		Description:   getString(serviceConfig, []string{"description"}),
-		DockerConfig:  buildDockerConfig(config),
-		DockerCfgPath: getString(config, []string{"huitaca", "docker", "dockerCfgPath"}),
+		DockerConfig:  buildDockerConfig(ctx.Config),
+		DockerCfgPath: getString(ctx.Config, []string{"huitaca", "docker", "dockerCfgPath"}),
 		// PullAuthentication: ...
 		// IncrementalAuthentication: ...
 		// DockerNetworkMode: ...
 		PreserveWorkingDir: true,
 		DisableRecursive:   false,
-		Source:             os.Getwd(),
+		Source:             utils.Getwd(),
 		//Tag: ... Defined at the platform
 		BuilderPullPolicy:       api.PullIfNotPresent,
 		PreviousImagePullPolicy: api.PullIfNotPresent,
@@ -61,12 +61,12 @@ func buildS2iConfig(ctx *CommandContext) *api.Config {
 		RemovePreviousImage:     false,
 	}
 
-	if gitRef, err := ctx.Command.GetString("git-ref"); err == nil {
+	if gitRef, err := ctx.Command.Flags().GetString("git-ref"); err == nil {
 		s2iConfig.Ref = gitRef
 	}
 
-	s2iConfig.Tag = ctx.Service + ":" + utils.WdHash
-	if imageTag, err := ctx.Command.GetString("image-tag"); err == nil {
+	s2iConfig.Tag = ctx.Service + ":" + utils.GetwdHash()
+	if imageTag, err := ctx.Command.Flags().GetString("image-tag"); err == nil {
 		s2iConfig.Tag = imageTag
 	}
 
