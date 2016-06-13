@@ -11,6 +11,9 @@ import (
 	"log"
 )
 
+const defaultScriptsURL = "image:///usr/libexec/s2i"
+const defaultAssembleUser = "1001"
+
 type CommandContext struct {
 	Service       string
 	Command       *cobra.Command
@@ -59,6 +62,8 @@ func buildS2iConfig(ctx *CommandContext) *api.Config {
 		PreviousImagePullPolicy: api.PullIfNotPresent,
 		Incremental:             true,
 		RemovePreviousImage:     false,
+		ScriptsURL:              defaultScriptsURL,
+		AssembleUser:            defaultAssembleUser,
 	}
 
 	if gitRef, err := ctx.Command.Flags().GetString("git-ref"); err == nil {

@@ -40,6 +40,11 @@ if [ -f "./pom.xml" ]; then
 
 	restore_saved_dependencies
 
+    pwd
+    ls -ltr .
+    whoami
+    env
+
 	if [ -z ${ARTIFACTS_DIR} ]; then
 	    export ARTIFACTS_DIR=$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate \
 		-Dexpression=project.build.directory | grep -Ev '(^\[|Download\w+:)')
@@ -49,11 +54,14 @@ if [ -f "./pom.xml" ]; then
 
 	if [ -z "$MAVEN_ARGS" ]; then
 #		export MAVEN_ARGS="package dependency:copy-dependencies -DskipTests -e -X"
-		export MAVEN_ARGS="package -DskipTests -e"
+		export MAVEN_ARGS="package -DskipTests -e -X"
 	fi
 	echo "---> Found pom.xml... attempting to build with 'mvn ${MAVEN_ARGS}'"
 
-	mvn --version
+    ls -ltr /usr/share/maven
+    ls -ltr /usr/share/maven/bin
+    ls -ltr $JAVA_HOME/
+	/usr/share/maven/bin/mvn --version
 	mvn $MAVEN_ARGS $MAVEN_DEBUG_ARGS | tee .mvn.out
 #	cat .mvn.out | grep "properties used" > .mvn.props
 #	sed -n 's/.*docker.env.MAIN=\([^, ]*\),.*/\1/p' .mvn.props | head -n 1 > $ARTIFACTS_DIR/JAVA_MAIN_CLASS

@@ -20,9 +20,9 @@ JOLOKIA_DEFAULT_DISCOVERY="false"
 J4LOG_VERSION="v0.1.0-alpha"
 J4LOG_DOWNLOAD="https://github.com/camilobermudez85/j4log/releases/download/${J4LOG_VERSION}/j4log-agent-${J4LOG_VERSION}.jar"
 
-MAVEN_VERSION="3.3.9"
+MAVEN_VERSION="3.3.3"
 MAVEN_HOME="/usr/share/maven"
-MAVEN_DOWNLOAD="http://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz"
+MAVEN_DOWNLOAD="http://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz"
 
 GRADLE_VERSION="2.6"
 GRADLE_HOME="/usr/share/gradle"

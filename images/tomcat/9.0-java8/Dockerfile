@@ -1,9 +1,10 @@
 FROM huitaca/java:openjdk-8
 
+ENV TOMCAT_MAJOR=9 \
+    TOMCAT_VERSION=9.0.0.M4
+
 ENV CATALINA_HOME=${HOME}/tomcat \
     PATH=${CATALINA_HOME}/bin:${PATH} \
-    TOMCAT_MAJOR=9 \
-    TOMCAT_VERSION=9.0.0.M4 \
     TOMCAT_TGZ_URL=https://www.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz
 
 RUN mkdir -p "${CATALINA_HOME}"

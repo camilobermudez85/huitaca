@@ -1,9 +1,10 @@
 FROM huitaca/java:openjdk-7
 
+ENV TOMCAT_MAJOR=7 \
+    TOMCAT_VERSION=7.0.69
+
 ENV CATALINA_HOME=${HOME}/tomcat \
     PATH=${CATALINA_HOME}/bin:${PATH} \
-    TOMCAT_MAJOR=7 \
-    TOMCAT_VERSION=7.0.68 \
     TOMCAT_TGZ_URL=https://www.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz
 
 RUN mkdir -p "${CATALINA_HOME}"

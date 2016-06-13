@@ -1,0 +1,26 @@
+[test-app]
+    description="Image display-name label"
+    displayName="Image description label"
+    version="1.7.2"
+    java="7"
+
+[test-app.loggers]
+    "org.apache.catalina"="DEBUG"
+    "javax.management"="DEBUG"
+
+[test-app.variables]
+    urlPagos="http://pagos.com"
+    dateFormat="dd/MM/yyyy"
+    timeFormat="HH:mm:ss"
+    dbHost="${driveMeDb.host}"
+    dbPort="${driveMeDb.port}"
+    dbVersion="${driveMeDb.version}"
+    mongoVersion="${driveMeDb.mongodb}"
+
+[test-app-db]
+    version="1.7.2"
+    mongodb="3.2.3"
+
+[test-app-cache]
+    version="1.7.2"
+    mongodb="3.2.3"

@@ -16,8 +16,8 @@ import (
 type JavaHandler struct{}
 
 var builderImages = map[string]string{
-	"7": "huitaca/java:open-jdk-7",
-	"8": "huitaca/java:open-jdk-8",
+	"7": "huitaca/java:openjdk-7",
+	"8": "huitaca/java:openjdk-8",
 }
 
 func (handler JavaHandler) HandleBuild(ctx *CommandContext) bool {
